@@ -3,23 +3,23 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-public class UserRepoImpl implements UserRepo {
+public class UserRepoImplWithLinkedList implements UserRepo {
 
-    private final List<User> users = new ArrayList<>();
+    private final List<User> users = new LinkedList<>();
 
     @Override
     public User saveUser(User user) {
         users.add(user);
-        System.out.println("User created!");
+        System.out.println("User created in LinkedList!");
         return user;
     }
 
     @Override
     public void deleteUser(User user) {
-        System.out.println("User deleted!");
+        System.out.println("User deleted from LinkedList!");
         users.remove(user);
     }
 
@@ -33,8 +33,11 @@ public class UserRepoImpl implements UserRepo {
 
     @Override
     public User updateUser(User user) {
-        int index = users.indexOf(user);
-        if (index != -1) users.set(index, user);
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).equals(user)) {
+                users.set(i, user);
+            }
+        }
         return user;
     }
 }

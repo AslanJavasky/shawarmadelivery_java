@@ -2,10 +2,12 @@ package com.aslanjavasky.shawarmadelviry.domain.interractor;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
+import lombok.Setter;
 
+@Setter
 public class UserInterractor {
 
-    private final UserRepo repo;
+    private  UserRepo repo;
 
     public UserInterractor(UserRepo userRepo) {
         this.repo = userRepo;
