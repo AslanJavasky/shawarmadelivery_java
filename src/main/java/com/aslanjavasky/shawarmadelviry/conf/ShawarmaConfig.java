@@ -27,7 +27,7 @@ public class ShawarmaConfig {
 
     @Bean
     public UserService userService(){
-        return new UserService();
+        return new UserService(userRepoLinkedList());
     }
 
     @Bean
@@ -39,13 +39,6 @@ public class ShawarmaConfig {
     public CommandLineRunner commandlineRunner(){
         return new ApplicationStartupRunner(userController());
     }
-
-
-//    @Bean
-//    public UserService userService(UserRepo userRepo){
-//        return new UserService(userRepo);
-//    }
-
 
 
 }

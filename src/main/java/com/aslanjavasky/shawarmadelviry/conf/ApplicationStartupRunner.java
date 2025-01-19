@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 
 public class ApplicationStartupRunner implements CommandLineRunner {
 
+
     private final UserController userController;
 
     public ApplicationStartupRunner(UserController userController) {
@@ -15,7 +16,9 @@ public class ApplicationStartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         userController.createUser(new User());
         userController.deleteUser(new User());
+
     }
 }
