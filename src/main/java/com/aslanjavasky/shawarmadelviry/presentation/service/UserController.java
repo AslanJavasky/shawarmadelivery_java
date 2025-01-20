@@ -1,7 +1,10 @@
 package com.aslanjavasky.shawarmadelviry.presentation.service;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
+@Controller
 public class UserController {
 
     private final UserService service;

@@ -4,6 +4,7 @@ import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
 import lombok.Setter;
 
+
 public class UserInterractor {
 
     private final UserRepo repo;

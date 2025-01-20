@@ -2,10 +2,11 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
-
+import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository("URwAL")
 public class UserRepoImpl implements UserRepo {
 
     private final List<User> users = new ArrayList<>();
