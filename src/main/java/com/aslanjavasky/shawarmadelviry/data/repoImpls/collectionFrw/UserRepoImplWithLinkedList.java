@@ -3,11 +3,12 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.LinkedList;
 import java.util.List;
 
-@Component("URwLL")
+@Repository("URwLL")
 public class UserRepoImplWithLinkedList implements UserRepo {
 
     private final List<User> users = new LinkedList<>();
