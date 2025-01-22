@@ -2,27 +2,30 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
-
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Repository("URwLL")
+@Slf4j
 public class UserRepoImplWithLinkedList implements UserRepo {
 
     private final List<User> users = new LinkedList<>();
+//    private final Logger log = Logger.getLogger("UserRepoImplWithLinkedList");
 
     @Override
     public User saveUser(User user) {
         users.add(user);
-        System.out.println("User created in LinkedList!");
+        log.info("User created in LinkedList!");
         return user;
     }
 
     @Override
     public void deleteUser(User user) {
-        System.out.println("User deleted from LinkedList!");
+        log.info("User deleted from LinkedList!");
         users.remove(user);
     }
 

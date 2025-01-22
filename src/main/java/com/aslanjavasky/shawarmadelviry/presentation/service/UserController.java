@@ -1,19 +1,20 @@
 package com.aslanjavasky.shawarmadelviry.presentation.service;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Scope;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+//import java.util.logging.Logger;
 
+@Slf4j
 @Controller
-@Lazy
 public class UserController {
 
     private final UserService service;
 
     public UserController(UserService service) {
-        System.out.println("UserController bean is created!");
+//        LoggerFactory.getLogger(UserController.class).info("UserController bean is created!");
+        log.info("UserController bean is created!");
         this.service = service;
     }
 

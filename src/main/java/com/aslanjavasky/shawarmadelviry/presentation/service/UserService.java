@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService extends UserInterractor  {
+public class UserService extends UserInterractor {
 
     private UserRepo userRepo;
 
-    public UserService(@Qualifier("URwLL") UserRepo userRepo) {
+    public UserService(@Qualifier("URwAL") UserRepo userRepo) {
         super(userRepo);
     }
 }
