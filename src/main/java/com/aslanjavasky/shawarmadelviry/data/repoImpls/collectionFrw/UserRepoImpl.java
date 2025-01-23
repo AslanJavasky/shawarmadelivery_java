@@ -17,11 +17,6 @@ import java.util.List;
 
 @Repository("URwAL")
 @Slf4j
-//@ConditionalOnBean(UserRepo.class)
-//@ConditionalOnMissingBean(UserRepo.class)
-//@ConditionalOnClass(name="com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw.UserRepoImpl")
-//@ConditionalOnMissingClass("com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw.UserRepoImpl")
-@ConditionalOnProperty(name = "shawarmadelivery.delivery", havingValue = "true")
 public class UserRepoImpl implements UserRepo {
 
     private final List<User> users = new ArrayList<>();

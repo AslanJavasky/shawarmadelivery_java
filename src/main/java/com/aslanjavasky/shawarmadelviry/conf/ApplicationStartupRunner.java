@@ -5,7 +5,7 @@ import com.aslanjavasky.shawarmadelviry.presentation.service.UserController;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class ApplicationStartupRunner implements CommandLineRunner {
 
     private final UserController userController;
@@ -17,9 +17,6 @@ public class ApplicationStartupRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        User user=new User();
-        userController.createUser(user);
-        userController.deleteUser(user);
 
     }
 
