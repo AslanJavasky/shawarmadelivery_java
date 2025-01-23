@@ -1,5 +1,9 @@
 package com.aslanjavasky.shawarmadelviry.conf;
 
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw.UserRepoImpl;
+import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -8,8 +12,9 @@ public class ShawarmaConfig {
 
 
 
-//    @Bean(value="URwAL")
+
 //    @Bean(name="URwAL")
+//    @ConditionalOnBean(UserRepo.class)
 //    public UserRepo userRepo(){
 //        return new UserRepoImpl();
 //    }

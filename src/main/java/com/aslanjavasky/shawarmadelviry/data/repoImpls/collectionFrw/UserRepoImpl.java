@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.boot.cloud.CloudPlatform;
+import org.springframework.boot.system.JavaVersion;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -14,6 +17,11 @@ import java.util.List;
 
 @Repository("URwAL")
 @Slf4j
+//@ConditionalOnBean(UserRepo.class)
+//@ConditionalOnMissingBean(UserRepo.class)
+//@ConditionalOnClass(name="com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw.UserRepoImpl")
+//@ConditionalOnMissingClass("com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw.UserRepoImpl")
+@ConditionalOnProperty(name = "shawarmadelivery.delivery", havingValue = "true")
 public class UserRepoImpl implements UserRepo {
 
     private final List<User> users = new ArrayList<>();
