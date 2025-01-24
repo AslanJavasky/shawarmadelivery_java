@@ -1,7 +1,8 @@
-package com.aslanjavasky.shawarmadelviry.presentation.service;
+package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
 import com.aslanjavasky.shawarmadelviry.conf.AuthUtils;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
+import com.aslanjavasky.shawarmadelviry.presentation.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

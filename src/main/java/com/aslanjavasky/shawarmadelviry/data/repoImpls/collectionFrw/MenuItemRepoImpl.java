@@ -3,11 +3,13 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.collectionFrw;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Repository
 public class MenuItemRepoImpl implements MenuItemRepo {
 
     private final List<MenuItem> items = new ArrayList<>();
