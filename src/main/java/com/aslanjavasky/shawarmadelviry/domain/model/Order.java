@@ -1,6 +1,8 @@
 package com.aslanjavasky.shawarmadelviry.domain.model;
 
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -11,5 +13,5 @@ public class Order {
     private OrderStatus status;
     private User user;
     private List<MenuItem> itemList;
-    private Integer totalPrice;
+    private BigDecimal totalPrice;
 }

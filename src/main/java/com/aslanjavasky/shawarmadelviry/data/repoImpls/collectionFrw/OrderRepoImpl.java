@@ -4,11 +4,13 @@ import com.aslanjavasky.shawarmadelviry.domain.model.Order;
 import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Repository
 public class OrderRepoImpl implements OrderRepo {
 
     private final List<Order> orders=new ArrayList<>();
