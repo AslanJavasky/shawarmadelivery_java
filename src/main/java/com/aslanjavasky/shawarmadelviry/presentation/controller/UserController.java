@@ -2,6 +2,7 @@ package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
 import com.aslanjavasky.shawarmadelviry.conf.AuthUtils;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
+import com.aslanjavasky.shawarmadelviry.presentation.service.SessionInfoService;
 import com.aslanjavasky.shawarmadelviry.presentation.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -15,10 +16,12 @@ public class UserController {
 
     private final UserService service;
     private final AuthUtils authUtils;
+    private final SessionInfoService sessionInfoService;
 
-    public UserController(UserService service, AuthUtils authUtils) {
+    public UserController(UserService service, AuthUtils authUtils, SessionInfoService sessionInfoService) {
         this.service = service;
         this.authUtils = authUtils;
+        this.sessionInfoService = sessionInfoService;
     }
 
     @GetMapping("/register")
@@ -39,6 +42,8 @@ public class UserController {
         user.setPassword(encodedPassword);
         service.createUser(user);
         log.info(String.valueOf(user));
+        sessionInfoService.setUserInfo(user);
+        log.info(String.valueOf(sessionInfoService));
         model.addAttribute("msg", "User registered successfully!");
         return "redirect:/users/login";
     }
@@ -61,6 +66,7 @@ public class UserController {
         try {
             User user = service.getUserByEmail(email);
             if (authUtils.authenticate(password, user.getPassword())) {
+                sessionInfoService.setUserInfo(user);
                 return "redirect:/menu";
             }
             model.addAttribute("error", "Invalid email or password");

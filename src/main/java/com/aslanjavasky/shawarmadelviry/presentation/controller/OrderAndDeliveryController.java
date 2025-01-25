@@ -1,16 +1,15 @@
 package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
-import com.aslanjavasky.shawarmadelviry.presentation.service.DeliveryService;
-import com.aslanjavasky.shawarmadelviry.presentation.service.MenuItemService;
-import com.aslanjavasky.shawarmadelviry.presentation.service.OrderService;
-import com.aslanjavasky.shawarmadelviry.presentation.service.UserService;
+import com.aslanjavasky.shawarmadelviry.presentation.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.context.annotation.SessionScope;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,12 +26,14 @@ public class OrderAndDeliveryController {
     private final OrderService orderService;
     private final DeliveryService deliveryService;
     private final UserService userService;
+    private final SessionInfoService sessionInfoService;
 
-    public OrderAndDeliveryController(MenuItemService menuItemService, OrderService orderService, DeliveryService deliveryService, UserService userService) {
+    public OrderAndDeliveryController(MenuItemService menuItemService, OrderService orderService, DeliveryService deliveryService, UserService userService, SessionInfoService sessionInfoService) {
         this.menuItemService = menuItemService;
         this.orderService = orderService;
         this.deliveryService = deliveryService;
         this.userService = userService;
+        this.sessionInfoService = sessionInfoService;
     }
 
     @PostMapping("/order")
@@ -47,37 +48,31 @@ public class OrderAndDeliveryController {
                 selectedMenuItems.add(menuItemService.getMenuItemById(selectedId.get(i)));
             }
         }
-        BigDecimal totalPrice = selectedMenuItems.stream()
-                .map(MenuItem::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Order order = new Order();
-        order.setStatus(OrderStatus.NEW);
-        order.setItemList(selectedMenuItems);
-        order.setTotalPrice(totalPrice);
-        order.setDateTime(LocalDateTime.now());
-
-        Delivery delivery = new Delivery();
-
-        User user=new User();
-
-        model.addAttribute("delivery", delivery);
-        model.addAttribute("order", order);
-        model.addAttribute("user", user);
-
+        sessionInfoService.setCart(selectedMenuItems);
+        model.addAttribute("sessionInfoService", sessionInfoService);
         return "order";
     }
 
     @PostMapping("/order/submit")
-    public String orderSubmit(
-            @ModelAttribute Delivery delivery,
-            @ModelAttribute Order order,
-            @ModelAttribute User user
-    ) {
-        log.info(String.valueOf(delivery));
-        log.info(String.valueOf(order));
-        log.info(String.valueOf(user));
+    public String orderSubmit() {
+        log.info(String.valueOf(sessionInfoService));
+
+        User user = userService.getUserByEmail(sessionInfoService.getEmail());
+        user.setAddress(sessionInfoService.getAddress());
+        user.setName(sessionInfoService.getUsername());
+        user.setPhone(sessionInfoService.getPhone());
+
+        Order order = new Order();
+        order.setStatus(OrderStatus.NEW);
+        order.setItemList(sessionInfoService.getCart());
+        order.setTotalPrice(sessionInfoService.getTotalPrice());
+        order.setDateTime(LocalDateTime.now());
         order.setUser(user);
+
+        Delivery delivery = new Delivery();
+        delivery.setDateTime(LocalDateTime.now());
+        delivery.setPhone(sessionInfoService.getPhone());
+        delivery.setAddress(sessionInfoService.getAddress());
         delivery.setOrder(order);
 
         orderService.createOrder(delivery.getOrder());
