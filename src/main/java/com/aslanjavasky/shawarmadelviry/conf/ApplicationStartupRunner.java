@@ -67,6 +67,10 @@ public class ApplicationStartupRunner implements CommandLineRunner {
         menuItemRepo.saveMenuItem(
                 new MenuItem(22L,"Кисло-Сладкий", MenuSection.SAUCE, BigDecimal.valueOf(40)));
 
+        menuItemRepo.saveMenuItem(
+                new MenuItem(23L,"Шаурма L", MenuSection.MAIN_MENU, BigDecimal.valueOf(240)));
+        menuItemRepo.saveMenuItem(
+                new MenuItem(24L,"Шаурма XL", MenuSection.MAIN_MENU, BigDecimal.valueOf(290)));
     }
 
 
