@@ -6,10 +6,9 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data @AllArgsConstructor
-public class MenuItem {
+public class MenuItem implements IMenuItem {
     private Long id;
     private String name;
     private MenuSection menuSection;
     private BigDecimal price;
-
 }

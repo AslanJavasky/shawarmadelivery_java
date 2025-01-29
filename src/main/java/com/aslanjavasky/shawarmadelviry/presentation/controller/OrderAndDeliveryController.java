@@ -43,7 +43,7 @@ public class OrderAndDeliveryController {
             @RequestParam List<Integer> quantities,
             Model model
     ) {
-        List<MenuItem> selectedMenuItems = new ArrayList<>();
+        List<IMenuItem> selectedMenuItems = new ArrayList<>();
         for (int i = 0; i < selectedId.size(); i++) {
             for (int j = 0; j < quantities.get(i); j++) {
                 selectedMenuItems.add(menuItemService.getMenuItemById(selectedId.get(i)));

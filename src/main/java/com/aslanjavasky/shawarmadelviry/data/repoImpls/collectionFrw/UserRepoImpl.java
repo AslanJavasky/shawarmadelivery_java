@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 //import java.util.logging.Logger;
 
 @Repository("URwAL")
@@ -14,11 +15,14 @@ import java.util.List;
 public class UserRepoImpl implements UserRepo {
 
     private final List<IUser> users = new ArrayList<>();
+    private final AtomicLong nextId=new AtomicLong(1);
+
 //    private final Logger log = Logger.getLogger("UserRepoImpl");
 //    private final Logger log= LoggerFactory.getLogger(UserRepoImpl.class);
 
     @Override
     public IUser saveUser(IUser user) {
+        user.setId(nextId.getAndIncrement());
         users.add(user);
         log.info("User created!");
         return user;

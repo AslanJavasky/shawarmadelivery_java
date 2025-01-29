@@ -1,10 +1,7 @@
 package com.aslanjavasky.shawarmadelviry.domain.interractor;
 
-import com.aslanjavasky.shawarmadelviry.domain.model.Order;
-import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
-import com.aslanjavasky.shawarmadelviry.domain.model.User;
+import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
-
 import java.util.List;
 
 public class OrderInterractor {
@@ -15,23 +12,23 @@ public class OrderInterractor {
         this.repo = repo;
     }
 
-    public Order createOrder(Order order) {
+    public IOrder createOrder(IOrder order) {
         return repo.saveOrder(order);
     }
 
-    public Order changeOrder(Order order) {
+    public IOrder changeOrder(IOrder order) {
         return repo.updateOrder(order);
     }
 
-    public Order updateOrderStatus(Long orderId, OrderStatus status) {
+    public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
         return repo.updateOrderStatus(orderId, status);
     }
 
-    public List<Order> getOrdersByUser(User user) {
+    public List<IOrder> getOrdersByUser(IUser user) {
         return repo.getOrdersByUser(user);
     }
 
-    public List<Order> getOrdersByStatus(OrderStatus status) {
+    public List<IOrder> getOrdersByStatus(OrderStatus status) {
         return repo.getOrdersByStatus(status);
     }
 

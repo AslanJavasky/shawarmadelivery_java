@@ -4,7 +4,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class Delivery {
+public class Delivery implements IDelivery {
     private Long id;
     private String address;
     private String phone;

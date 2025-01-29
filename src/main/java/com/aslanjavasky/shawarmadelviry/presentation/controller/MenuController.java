@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
+import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.presentation.service.MenuItemService;
@@ -25,7 +26,7 @@ public class MenuController {
 
     @GetMapping
     public String showMenu(Model model) {
-        Map<String, List<MenuItem>> menuItemsBySection = Map.of(
+        Map<String, List<IMenuItem>> menuItemsBySection = Map.of(
                 "menu.main_menu", service.getMenuItemsBySection(MenuSection.MAIN_MENU),
                 "menu.zakuski", service.getMenuItemsBySection(MenuSection.ZAKUSKI),
                 "menu.dobavki", service.getMenuItemsBySection(MenuSection.DOBAVKI),

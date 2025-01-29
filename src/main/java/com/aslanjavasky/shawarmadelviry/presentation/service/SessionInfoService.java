@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.presentation.service;
 
+import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
@@ -18,7 +19,7 @@ public class SessionInfoService {
     private String phone;
     private String address;
     private String email;
-    private List<MenuItem> cart;
+    private List<IMenuItem> cart;
 
     public void setUserInfo(IUser user){
         setUsername(user.getName());
@@ -27,6 +28,6 @@ public class SessionInfoService {
         setEmail(user.getEmail());
     }
     public BigDecimal getTotalPrice(){
-        return cart.stream().map(MenuItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return cart.stream().map(IMenuItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

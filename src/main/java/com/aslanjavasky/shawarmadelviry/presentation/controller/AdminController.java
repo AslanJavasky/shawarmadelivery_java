@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
+import com.aslanjavasky.shawarmadelviry.domain.model.IOrder;
 import com.aslanjavasky.shawarmadelviry.domain.model.Order;
 import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
 import com.aslanjavasky.shawarmadelviry.presentation.service.OrderService;
@@ -44,7 +45,7 @@ public class AdminController {
     }
 
     @ModelAttribute(name = "newOrders")
-    public List<Order> getNewOrders() {
+    public List<IOrder> getNewOrders() {
         return orderService.getOrdersByStatus(OrderStatus.NEW);
     }
 

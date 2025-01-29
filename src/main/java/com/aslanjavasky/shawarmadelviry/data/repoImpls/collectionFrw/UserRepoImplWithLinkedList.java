@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 @Repository("URwLL")
@@ -15,10 +16,12 @@ import java.util.logging.Logger;
 public class UserRepoImplWithLinkedList implements UserRepo {
 
     private final List<IUser> users = new LinkedList<>();
+    private final AtomicLong nextId=new AtomicLong(1);
 //    private final Logger log = Logger.getLogger("UserRepoImplWithLinkedList");
 
     @Override
     public IUser saveUser(IUser user) {
+        user.setId(nextId.getAndIncrement());
         users.add(user);
         log.info("User created in LinkedList!");
         return user;

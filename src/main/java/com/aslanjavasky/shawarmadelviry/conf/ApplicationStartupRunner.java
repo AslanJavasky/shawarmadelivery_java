@@ -20,6 +20,7 @@ public class ApplicationStartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         menuItemRepo.saveMenuItem(
                 new MenuItem(1L,"Гиро в лаваше L", MenuSection.MAIN_MENU, BigDecimal.valueOf(240)));
         menuItemRepo.saveMenuItem(
