@@ -5,18 +5,10 @@ import com.aslanjavasky.shawarmadelviry.presentation.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
-import org.springframework.web.context.annotation.SessionScope;
-
-import java.math.BigDecimal;
+import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Controller
@@ -36,8 +28,17 @@ public class OrderAndDeliveryController {
         this.sessionInfoService = sessionInfoService;
     }
 
+    @GetMapping("/order")
+    public String showOrderForm(Model model){
+        if (sessionInfoService.getCart() == null || sessionInfoService.getCart().isEmpty()){
+            return "redirect:/menu";
+        }
+        model.addAttribute("sessionInfoService", sessionInfoService);
+        return "order";
+    }
+
     @PostMapping("/order")
-    public String showOrderForm(
+    public String processOrderForm(
             @RequestParam List<Long> selectedId,
             @RequestParam List<Integer> quantities,
             Model model
