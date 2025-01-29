@@ -1,9 +1,10 @@
 package com.aslanjavasky.shawarmadelviry.domain.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@Data
-public class User {
+@Data @AllArgsConstructor
+public class User implements IUser {
     private Long id;
     private String name;
     private String email;

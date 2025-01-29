@@ -13,4 +13,5 @@ public class UserService extends UserInterractor {
     public UserService(@Qualifier("URwAL") UserRepo userRepo) {
         super(userRepo);
     }
+
 }

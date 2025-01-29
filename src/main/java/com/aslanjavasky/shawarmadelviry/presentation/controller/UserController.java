@@ -1,12 +1,16 @@
 package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
 import com.aslanjavasky.shawarmadelviry.conf.AuthUtils;
+import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.presentation.service.SessionInfoService;
 import com.aslanjavasky.shawarmadelviry.presentation.service.UserService;
+import com.aslanjavasky.shawarmadelviry.presentation.service.dto.UserDto;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -28,15 +32,21 @@ public class UserController {
     public String register(
             Model model
     ) {
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new UserDto());
         return "register";
     }
 
     @PostMapping("/register")
     public String registerUser(
-            @ModelAttribute User user,
+            @Valid @ModelAttribute("user") UserDto user,
+            BindingResult result,
             Model model
     ) {
+        if (result.hasErrors()) {
+//            log.info("ValidationErrors:"+result.getFieldError());
+            model.addAttribute("user", user);
+            return "register";
+        }
 
         String encodedPassword = authUtils.encodePassword(user.getPassword());
         user.setPassword(encodedPassword);
@@ -64,7 +74,7 @@ public class UserController {
             Model model
     ) {
         try {
-            User user = service.getUserByEmail(email);
+            IUser user = service.getUserByEmail(email);
             if (authUtils.authenticate(password, user.getPassword())) {
                 sessionInfoService.setUserInfo(user);
                 return "redirect:/menu";
@@ -83,7 +93,7 @@ public class UserController {
             @RequestParam String email
     ) {
 
-        User user = service.getUserByEmail(email);
+        IUser user = service.getUserByEmail(email);
         service.deleteUser(user);
         return "redirect:/users/register";
 
