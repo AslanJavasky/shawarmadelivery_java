@@ -2,13 +2,22 @@ package com.aslanjavasky.shawarmadelviry.presentation.service;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
-import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
+import com.aslanjavasky.shawarmadelviry.presentation.service.dto.OrderDto;
+import com.aslanjavasky.shawarmadelviry.presentation.service.dto.UserDto;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,17 +26,39 @@ import java.util.List;
 public class SessionInfoService {
     private String username;
     private String phone;
+    private String password;
     private String address;
     private String email;
-    private List<IMenuItem> cart;
+    private String telegram;
+//    @Size(min=1, message = "Please, select at least 1 item to place an order.")
+    private List<IMenuItem> cart = new ArrayList<>();
 
-    public void setUserInfo(IUser user){
-        setUsername(user.getName());
-        setPhone(user.getPhone());
-        setAddress(user.getAddress());
-        setEmail(user.getEmail());
-    }
     public BigDecimal getTotalPrice(){
         return cart.stream().map(IMenuItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public IUser getUser() {
+        User user=new User();
+        user.setName(username);
+        user.setTelegram(telegram);
+        user.setAddress(address);
+        user.setPhone(phone);
+        user.setEmail(email);
+        return user;
+    }
+
+    public void setUserFields(UserDto userDto) {
+        this.username=userDto.getName();
+        this.password=userDto.getPassword();
+        this.address=userDto.getAddress();
+        this.phone=userDto.getPhone();
+        this.email=userDto.getEmail();
+        this.telegram=userDto.getTelegram();
+    }
+
+    public void setInfoFromOrderDto(OrderDto orderDto) {
+        username=orderDto.getUsername();
+        phone=orderDto.getPhone();
+        address=orderDto.getAddress();
     }
 }

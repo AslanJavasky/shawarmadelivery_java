@@ -2,9 +2,9 @@ package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
 import com.aslanjavasky.shawarmadelviry.conf.AuthUtils;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
-import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.presentation.service.SessionInfoService;
 import com.aslanjavasky.shawarmadelviry.presentation.service.UserService;
+import com.aslanjavasky.shawarmadelviry.presentation.service.dto.LoginCredential;
 import com.aslanjavasky.shawarmadelviry.presentation.service.dto.UserDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users") //localhost:8081/users
 public class UserController {
 
-    private final UserService service;
+    private final UserService userService;
     private final AuthUtils authUtils;
     private final SessionInfoService sessionInfoService;
 
-    public UserController(UserService service, AuthUtils authUtils, SessionInfoService sessionInfoService) {
-        this.service = service;
+    public UserController(UserService userService, AuthUtils authUtils, SessionInfoService sessionInfoService) {
+        this.userService = userService;
         this.authUtils = authUtils;
         this.sessionInfoService = sessionInfoService;
     }
@@ -32,28 +32,29 @@ public class UserController {
     public String register(
             Model model
     ) {
-        model.addAttribute("user", new UserDto());
+        model.addAttribute("userDto", new UserDto());
         return "register";
     }
 
     @PostMapping("/register")
     public String registerUser(
-            @Valid @ModelAttribute("user") UserDto user,
+            @Valid @ModelAttribute("userDto") UserDto userDto,
             BindingResult result,
             Model model
     ) {
         if (result.hasErrors()) {
 //            log.info("ValidationErrors:"+result.getFieldError());
-            model.addAttribute("user", user);
+            model.addAttribute("userDto", userDto);
             return "register";
         }
 
-        String encodedPassword = authUtils.encodePassword(user.getPassword());
-        user.setPassword(encodedPassword);
-        service.createUser(user);
-        log.info(String.valueOf(user));
-        sessionInfoService.setUserInfo(user);
-        log.info(String.valueOf(sessionInfoService));
+        String encodedPassword = authUtils.encodePassword(userDto.getPassword());
+        userDto.setPassword(encodedPassword);
+        userService.createUser(userDto);
+        sessionInfoService.setUserFields(userDto);
+
+        log.info("userDto (POST registerUser)" + String.valueOf(userDto));
+        log.info("sessionInfoService (POST registerUser)" + String.valueOf(sessionInfoService));
         model.addAttribute("msg", "User registered successfully!");
         return "redirect:/users/login";
     }
@@ -62,21 +63,25 @@ public class UserController {
     public String showLoginForm(
             Model model
     ) {
-        model.addAttribute("email", "");
-        model.addAttribute("password", "");
+        model.addAttribute("credential", new LoginCredential());
         return "login";
     }
 
     @PostMapping("/login")
     public String loginUser(
-            @RequestParam String email,
-            @RequestParam String password,
+            @Valid @ModelAttribute(name = "credential") LoginCredential credential,
+            BindingResult result,
             Model model
     ) {
+        if (result.hasErrors()) {
+            model.addAttribute("user", credential);
+            return "login";
+        }
+
         try {
-            IUser user = service.getUserByEmail(email);
-            if (authUtils.authenticate(password, user.getPassword())) {
-                sessionInfoService.setUserInfo(user);
+            IUser user = userService.getUserByEmail(credential.getEmail());
+            if (authUtils.authenticate(credential.getPassword(), user.getPassword())) {
+                log.info("sessionInfoService.getEmail():" + sessionInfoService.getEmail());
                 return "redirect:/menu";
             }
             model.addAttribute("error", "Invalid email or password");
@@ -93,10 +98,14 @@ public class UserController {
             @RequestParam String email
     ) {
 
-        IUser user = service.getUserByEmail(email);
-        service.deleteUser(user);
+        IUser user = userService.getUserByEmail(email);
+        userService.deleteUser(user);
         return "redirect:/users/register";
-
-
     }
+
+//    @ModelAttribute(name="sessionInfoService")
+//    public SessionInfoService sessionInfoService(){
+//        return sessionInfoService;
+//    }
+
 }

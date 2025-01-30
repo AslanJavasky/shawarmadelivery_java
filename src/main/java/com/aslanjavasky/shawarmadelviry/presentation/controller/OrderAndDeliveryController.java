@@ -2,9 +2,12 @@ package com.aslanjavasky.shawarmadelviry.presentation.controller;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.presentation.service.*;
+import com.aslanjavasky.shawarmadelviry.presentation.service.dto.OrderDto;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,14 +17,12 @@ import java.util.List;
 @Controller
 public class OrderAndDeliveryController {
 
-    private final MenuItemService menuItemService;
     private final OrderService orderService;
     private final DeliveryService deliveryService;
     private final UserService userService;
     private final SessionInfoService sessionInfoService;
 
-    public OrderAndDeliveryController(MenuItemService menuItemService, OrderService orderService, DeliveryService deliveryService, UserService userService, SessionInfoService sessionInfoService) {
-        this.menuItemService = menuItemService;
+    public OrderAndDeliveryController(OrderService orderService, DeliveryService deliveryService, UserService userService, SessionInfoService sessionInfoService) {
         this.orderService = orderService;
         this.deliveryService = deliveryService;
         this.userService = userService;
@@ -30,33 +31,32 @@ public class OrderAndDeliveryController {
 
     @GetMapping("/order")
     public String showOrderForm(Model model){
-        if (sessionInfoService.getCart() == null || sessionInfoService.getCart().isEmpty()){
-            return "redirect:/menu";
-        }
-        model.addAttribute("sessionInfoService", sessionInfoService);
-        return "order";
-    }
-
-    @PostMapping("/order")
-    public String processOrderForm(
-            @RequestParam List<Long> selectedId,
-            @RequestParam List<Integer> quantities,
-            Model model
-    ) {
-        List<IMenuItem> selectedMenuItems = new ArrayList<>();
-        for (int i = 0; i < selectedId.size(); i++) {
-            for (int j = 0; j < quantities.get(i); j++) {
-                selectedMenuItems.add(menuItemService.getMenuItemById(selectedId.get(i)));
-            }
-        }
-        sessionInfoService.setCart(selectedMenuItems);
+        model.addAttribute("orderDto", new OrderDto(
+                sessionInfoService.getUsername(),
+                sessionInfoService.getAddress(),
+                sessionInfoService.getPhone()));
         model.addAttribute("sessionInfoService", sessionInfoService);
         return "order";
     }
 
     @PostMapping("/order/submit")
-    public String orderSubmit() {
-        log.info(String.valueOf(sessionInfoService));
+    public String orderSubmit(
+         @Valid @ModelAttribute("orderDto") OrderDto orderDto,
+         BindingResult result,
+         Model model
+    ) {
+
+        if (result.hasErrors()){
+            model.addAttribute("sessionInfoService", sessionInfoService);
+            model.addAttribute("orderDto",orderDto);
+            return "order";
+        }
+
+        sessionInfoService.setInfoFromOrderDto(orderDto);
+
+//        log.info(String.valueOf(sessionInfoService));
+//        log.info("userService.getUserByEmail:"+userService.getUserByEmail(sessionInfoService.getEmail()));
+//        log.info("sessionInfoService.getEmail():"+sessionInfoService.getEmail());
 
         IUser user = userService.getUserByEmail(sessionInfoService.getEmail());
         user.setAddress(sessionInfoService.getAddress());
