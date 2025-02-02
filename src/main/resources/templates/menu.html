@@ -14,7 +14,6 @@
     <div th:each="section: ${menuItemsBySection}">
 
         <h2 th:text="#{${section.key}}"> Section:</h2>
-
         <div class="menu-section">
             <div th:each="item : ${section.value}" class="menu-item">
                 <input type="checkbox" th:id="|item_${item.id}|" th:name="selectedId" th:value="${item.id}"

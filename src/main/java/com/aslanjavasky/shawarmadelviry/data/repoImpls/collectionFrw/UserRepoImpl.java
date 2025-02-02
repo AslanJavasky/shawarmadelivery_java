@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 //import java.util.logging.Logger;
+ //JPA-Hibernate ORM -> PreperedStatement JOOQ SQL-HQL NoSQL
+//Create(INSERT) Read(SELECT) Update Delete
+//JDBC
+
 
 @Repository("URwAL")
 @Slf4j
