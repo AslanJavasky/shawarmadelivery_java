@@ -11,4 +11,5 @@ public class ShawarmadelviryApplication {
 		SpringApplication.run(ShawarmadelviryApplication.class, args);
 	}
 
+
 }
