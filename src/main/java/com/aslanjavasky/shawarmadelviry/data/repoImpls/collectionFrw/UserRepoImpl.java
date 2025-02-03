@@ -39,6 +39,11 @@ public class UserRepoImpl implements UserRepo {
     }
 
     @Override
+    public void deleteUserByEmail(String email) {
+
+    }
+
+    @Override
     public IUser getUserByEmail(String email) {
         return users.stream()
                 .filter(user -> user.getEmail().equals(email))

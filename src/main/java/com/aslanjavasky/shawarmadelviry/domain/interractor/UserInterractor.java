@@ -22,6 +22,10 @@ public class UserInterractor {
         repo.deleteUser(user);
     }
 
+    public void deleteUserByEmail(String email){
+        repo.deleteUserByEmail(email);
+    }
+
     public IUser getUserByEmail(String email){
         return repo.getUserByEmail(email);
     }

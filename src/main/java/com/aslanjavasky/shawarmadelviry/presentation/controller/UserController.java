@@ -98,8 +98,9 @@ public class UserController {
             @RequestParam String email
     ) {
 
-        IUser user = userService.getUserByEmail(email);
-        userService.deleteUser(user);
+//        IUser user = userService.getUserByEmail(email);
+//        userService.deleteUser(user);
+        userService.deleteUserByEmail(email);
         return "redirect:/users/register";
     }
 

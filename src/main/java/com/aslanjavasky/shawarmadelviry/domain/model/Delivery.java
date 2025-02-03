@@ -9,5 +9,5 @@ public class Delivery implements IDelivery {
     private String address;
     private String phone;
     private LocalDateTime dateTime;
-    private Order order;
+    private IOrder order;
 }

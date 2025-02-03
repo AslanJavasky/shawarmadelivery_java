@@ -19,7 +19,7 @@ public interface IDelivery {
 
     void setDateTime(LocalDateTime dateTime) ;
 
-    Order getOrder() ;
+    IOrder getOrder() ;
 
-    void setOrder(Order order);
+    void setOrder(IOrder order);
 }

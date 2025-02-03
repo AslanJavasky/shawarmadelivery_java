@@ -3,6 +3,7 @@ package com.aslanjavasky.shawarmadelviry.conf;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ public class ApplicationStartupRunner implements CommandLineRunner {
 
     private final MenuItemRepo menuItemRepo;
 
-    public ApplicationStartupRunner(MenuItemRepo menuItemRepo) {
+    public ApplicationStartupRunner(@Qualifier("MRwPS") MenuItemRepo menuItemRepo) {
 
         this.menuItemRepo = menuItemRepo;
     }
