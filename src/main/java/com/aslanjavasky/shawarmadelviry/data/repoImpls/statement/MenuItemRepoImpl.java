@@ -7,10 +7,7 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,15 +22,26 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
     @Override
     public IMenuItem saveMenuItem(IMenuItem menuItem) {
+
+        if (menuItem == null) throw new IllegalArgumentException("menuItem cannot be null");
+
         String sql = "INSERT INTO menu_items (name, menu_section, price) VALUES(?,?,?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)
+             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
             ps.setString(1, menuItem.getName());
             ps.setString(2, menuItem.getMenuSection().name());
             ps.setBigDecimal(3, menuItem.getPrice());
 
-            ps.executeUpdate();
+            int affectedRow= ps.executeUpdate();
+            if (affectedRow == 0) throw new SQLException("Failed to save menuItem, no rows affected");
+
+            try (ResultSet rs= ps.getGeneratedKeys()){
+                while(rs.next()){
+                    menuItem.setId(rs.getLong("id"));
+                }
+            }
+
             return menuItem;
 
         } catch (SQLException e) {
@@ -43,6 +51,9 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
     @Override
     public IMenuItem updateMenuItem(IMenuItem menuItem) {
+
+        if (menuItem == null) throw new IllegalArgumentException("menuItem cannot be null");
+
         String sql = "UPDATE menu_items SET name=?, menu_section=?, price=? WHERE id=?;";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)
@@ -51,7 +62,9 @@ public class MenuItemRepoImpl implements MenuItemRepo {
             ps.setString(2, menuItem.getMenuSection().name());
             ps.setBigDecimal(3, menuItem.getPrice());
             ps.setLong(4, menuItem.getId());
-            ps.executeUpdate();
+
+            int affectedRow= ps.executeUpdate();
+            if (affectedRow == 0) throw new SQLException("Failed to update menuItem, no rows affected");
             return menuItem;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -60,6 +73,9 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
     @Override
     public IMenuItem getMenuItemById(Long id) {
+
+        if (id==null) throw new IllegalArgumentException("Id cannot be null");
+
         String sql = "SELECT * FROM menu_items WHERE id=?;";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -107,12 +123,16 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
     @Override
     public void deleteMenuItem(IMenuItem menuItem) {
+        if (menuItem==null) throw new IllegalArgumentException("Menu Item cannot be null");
         String sql = "DELETE FROM menu_items WHERE id=?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)
         ) {
             ps.setLong(1, menuItem.getId());
-            ps.executeUpdate();
+
+            int affectedRow= ps.executeUpdate();
+            if (affectedRow == 0) throw new SQLException("Failed to delete menuItem, no rows affected");
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

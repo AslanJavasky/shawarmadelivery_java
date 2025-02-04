@@ -1,5 +1,9 @@
 package com.aslanjavasky.shawarmadelviry.domain.model;
 
+import lombok.Data;
+import lombok.ToString;
+
+
 public interface IUser {
     Long getId();
 

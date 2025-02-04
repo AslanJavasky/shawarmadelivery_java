@@ -26,11 +26,14 @@ public class OrderRepoImpl implements OrderRepo {
 
     @Override
     public IOrder saveOrder(IOrder order) {
+
+        if (order == null) throw new IllegalArgumentException("order cannot be null");
+
         String sqlOrder = "INSERT INTO orders(date_time, status,user_id,total_price) VALUES(?,?,?,?);";
         String sqlOrderMenuitems = "INSERT INTO orders_menu_items(order_id, menu_item_id) VALUES(?,?);";
 
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement psIntoOrders = connection.prepareStatement(sqlOrder);
+             PreparedStatement psIntoOrders = connection.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement psIntoOrdersMenuitems = connection.prepareStatement(sqlOrderMenuitems);
         ) {
             psIntoOrders.setTimestamp(1, Timestamp.valueOf(order.getDateTime()));
@@ -38,12 +41,19 @@ public class OrderRepoImpl implements OrderRepo {
             psIntoOrders.setLong(3, order.getId());
             psIntoOrders.setBigDecimal(4, order.getTotalPrice());
 
-            psIntoOrders.executeUpdate();
+            int affectedRow = psIntoOrders.executeUpdate();
+            if (affectedRow == 0) throw new SQLException("Failed to save order, no rows affected");
 
             for (IMenuItem item : order.getItemList()) {
                 psIntoOrdersMenuitems.setLong(1, order.getId());
                 psIntoOrdersMenuitems.setLong(2, item.getId());
                 psIntoOrdersMenuitems.executeUpdate();
+            }
+
+            try (ResultSet rs=psIntoOrders.getGeneratedKeys()){
+                while (rs.next()){
+                    order.setId(rs.getLong("id"));
+                }
             }
 
             return order;
@@ -56,6 +66,9 @@ public class OrderRepoImpl implements OrderRepo {
 
     @Override
     public IOrder updateOrder(IOrder order) {
+
+        if (order == null) throw new IllegalArgumentException("order cannot be null");
+
         String sql = "UPDATE orders SET date_time=?, status=?, user_id=?, total_price=?  WHERE id=?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)
@@ -65,7 +78,9 @@ public class OrderRepoImpl implements OrderRepo {
             ps.setLong(3, order.getUser().getId());
             ps.setBigDecimal(4, order.getTotalPrice());
             ps.setLong(5, order.getId());
-            ps.executeUpdate();
+
+            int affectedRow = ps.executeUpdate();
+            if (affectedRow == 0) throw new SQLException("Failed to update order, no rows affected");
 
             return order;
         } catch (SQLException e) {
@@ -75,6 +90,9 @@ public class OrderRepoImpl implements OrderRepo {
 
     @Override
     public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
+
+        if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
+
         String sql = "UPDATE orders SET status=? WHERE id=?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)
@@ -82,7 +100,8 @@ public class OrderRepoImpl implements OrderRepo {
             ps.setString(1, status.name());
             ps.setLong(2, orderId);
 
-            ps.executeUpdate();
+            int affectedRow = ps.executeUpdate();
+            if (affectedRow == 0) throw new SQLException("Failed to update order status, no rows affected");
 
             return getOrderById(orderId);
         } catch (SQLException e) {
@@ -93,6 +112,9 @@ public class OrderRepoImpl implements OrderRepo {
 
     @Override
     public List<IOrder> getOrdersByUser(IUser user) {
+
+        if (user == null) throw new IllegalArgumentException("user cannot be null");
+
         List<IOrder> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders WHERE user_id=?";
         try (Connection connection = dataSource.getConnection();
@@ -139,6 +161,9 @@ public class OrderRepoImpl implements OrderRepo {
 
 
     public IOrder getOrderById(Long orderId) {
+
+        if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
+
         String sql = "SELECT * FROM orders WHERE order_id=?";
         String sqlFromOrdersMenuItems = "SELECT * FROM orders_menu_items WHERE order_id=?";
         try (Connection connection = dataSource.getConnection();
