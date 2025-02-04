@@ -11,4 +11,5 @@ public interface MenuItemRepo {
     IMenuItem getMenuItemById(Long id);
     List<IMenuItem> getMenuItemsBySection(MenuSection section);
     void deleteMenuItem(IMenuItem menuItem);
+    void deleteAll();
 }

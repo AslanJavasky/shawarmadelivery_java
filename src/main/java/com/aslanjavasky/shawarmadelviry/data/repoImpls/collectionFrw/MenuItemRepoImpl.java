@@ -50,4 +50,9 @@ public class MenuItemRepoImpl implements MenuItemRepo {
     public void deleteMenuItem(IMenuItem menuItem) {
         items.remove(menuItem);
     }
+
+    @Override
+    public void deleteAll() {
+
+    }
 }

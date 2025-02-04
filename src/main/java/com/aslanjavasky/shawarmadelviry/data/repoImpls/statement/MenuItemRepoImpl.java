@@ -29,6 +29,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
+
             ps.setString(1, menuItem.getName());
             ps.setString(2, menuItem.getMenuSection().name());
             ps.setBigDecimal(3, menuItem.getPrice());
@@ -132,6 +133,20 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
             int affectedRow= ps.executeUpdate();
             if (affectedRow == 0) throw new SQLException("Failed to delete menuItem, no rows affected");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        String sql="DELETE FROM menu_items";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)
+        ) {
+            int affectedRow= ps.executeUpdate();
+//            if (affectedRow == 0) throw new SQLException("Failed to delete menuItem, no rows affected");
 
         } catch (SQLException e) {
             e.printStackTrace();

@@ -5,7 +5,6 @@ import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.*;
 
