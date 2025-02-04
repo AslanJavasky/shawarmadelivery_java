@@ -5,7 +5,6 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -29,31 +28,32 @@ public class OrderRepoImpl implements OrderRepo {
 
         if (order == null) throw new IllegalArgumentException("order cannot be null");
 
-        String sqlOrder = "INSERT INTO orders(date_time, status,user_id,total_price) VALUES(?,?,?,?);";
+        String sqlOrder = "INSERT INTO orders(date_time, status, user_id, total_price) VALUES(?,?,?,?);";
         String sqlOrderMenuitems = "INSERT INTO orders_menu_items(order_id, menu_item_id) VALUES(?,?);";
 
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement psIntoOrders = connection.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement psIntoOrders = connection.prepareStatement(
+                     sqlOrder, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement psIntoOrdersMenuitems = connection.prepareStatement(sqlOrderMenuitems);
         ) {
             psIntoOrders.setTimestamp(1, Timestamp.valueOf(order.getDateTime()));
             psIntoOrders.setString(2, order.getStatus().name());
-            psIntoOrders.setLong(3, order.getId());
+            psIntoOrders.setLong(3, order.getUser().getId());
             psIntoOrders.setBigDecimal(4, order.getTotalPrice());
 
             int affectedRow = psIntoOrders.executeUpdate();
             if (affectedRow == 0) throw new SQLException("Failed to save order, no rows affected");
 
-            for (IMenuItem item : order.getItemList()) {
-                psIntoOrdersMenuitems.setLong(1, order.getId());
-                psIntoOrdersMenuitems.setLong(2, item.getId());
-                psIntoOrdersMenuitems.executeUpdate();
-            }
-
             try (ResultSet rs=psIntoOrders.getGeneratedKeys()){
                 while (rs.next()){
                     order.setId(rs.getLong("id"));
                 }
+            }
+
+            for (IMenuItem item : order.getItemList()) {
+                psIntoOrdersMenuitems.setLong(1, order.getId());
+                psIntoOrdersMenuitems.setLong(2, item.getId());
+                psIntoOrdersMenuitems.executeUpdate();
             }
 
             return order;
@@ -164,7 +164,7 @@ public class OrderRepoImpl implements OrderRepo {
 
         if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
 
-        String sql = "SELECT * FROM orders WHERE order_id=?";
+        String sql = "SELECT * FROM orders WHERE id=?";
         String sqlFromOrdersMenuItems = "SELECT * FROM orders_menu_items WHERE order_id=?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
@@ -178,9 +178,8 @@ public class OrderRepoImpl implements OrderRepo {
                     order.setId(rs.getLong("id"));
                     order.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
                     order.setStatus(OrderStatus.valueOf(rs.getString("status")));
-                    order.setUser(userRepoImpl.getUserById(rs.getLong("id")));
+                    order.setUser(userRepoImpl.getUserById(rs.getLong("user_id")));
                     order.setTotalPrice(rs.getBigDecimal("total_price"));
-
                 }
             }
             psFromOrdersMenuItems.setLong(1, orderId);

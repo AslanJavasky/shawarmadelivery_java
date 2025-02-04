@@ -81,7 +81,17 @@ public class UserController {
         try {
             IUser user = userService.getUserByEmail(credential.getEmail());
             if (authUtils.authenticate(credential.getPassword(), user.getPassword())) {
-                log.info("sessionInfoService.getEmail():" + sessionInfoService.getEmail());
+                if (sessionInfoService.getUsername() == null){
+                    UserDto userDto=new UserDto();
+                    userDto.setName(user.getName());
+                    userDto.setPhone(user.getPhone());
+                    userDto.setAddress(user.getAddress());
+                    userDto.setEmail(user.getEmail());
+                    userDto.setTelegram(user.getTelegram());
+                    userDto.setPassword(user.getPassword());
+                    sessionInfoService.setUserFields(userDto);
+                }
+
                 return "redirect:/menu";
             }
             model.addAttribute("error", "Invalid email or password");

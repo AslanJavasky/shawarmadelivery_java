@@ -21,7 +21,7 @@ public class ApplicationStartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        menuItemRepo.deleteAll();
+//        menuItemRepo.deleteAll();
 
         menuItemRepo.saveMenuItem(
                 new MenuItem(1L,"Гиро в лаваше L", MenuSection.MAIN_MENU, BigDecimal.valueOf(240)));

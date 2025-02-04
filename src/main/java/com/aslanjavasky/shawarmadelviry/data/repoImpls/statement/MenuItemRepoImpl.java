@@ -25,14 +25,17 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
         if (menuItem == null) throw new IllegalArgumentException("menuItem cannot be null");
 
-        String sql = "INSERT INTO menu_items (name, menu_section, price) VALUES(?,?,?)";
+        String sql = "INSERT INTO menu_items (id, name, menu_section, price) VALUES(?,?,?,?) " +
+                "ON CONFLICT (id) DO " +
+                "UPDATE SET name=EXCLUDED.name,menu_section=EXCLUDED.menu_section,price=EXCLUDED.price";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
 
-            ps.setString(1, menuItem.getName());
-            ps.setString(2, menuItem.getMenuSection().name());
-            ps.setBigDecimal(3, menuItem.getPrice());
+            ps.setLong(1, menuItem.getId());
+            ps.setString(2, menuItem.getName());
+            ps.setString(3, menuItem.getMenuSection().name());
+            ps.setBigDecimal(4, menuItem.getPrice());
 
             int affectedRow= ps.executeUpdate();
             if (affectedRow == 0) throw new SQLException("Failed to save menuItem, no rows affected");
