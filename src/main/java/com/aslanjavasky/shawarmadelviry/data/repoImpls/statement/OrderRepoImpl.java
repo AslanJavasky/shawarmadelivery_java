@@ -5,6 +5,7 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class OrderRepoImpl implements OrderRepo {
     private final MenuItemRepo menuItemRepo;
     private final UserRepoImpl userRepoImpl;
 
-    public OrderRepoImpl(DataSource dataSource, @Qualifier("MRwPS") MenuItemRepo menuItemRepo,@Qualifier("URwPS") UserRepoImpl userRepoImpl) {
+    public OrderRepoImpl(DataSource dataSource, @Qualifier("MRwPS") MenuItemRepo menuItemRepo, @Qualifier("URwPS") UserRepoImpl userRepoImpl) {
         this.dataSource = dataSource;
         this.menuItemRepo = menuItemRepo;
         this.userRepoImpl = userRepoImpl;
@@ -44,8 +45,8 @@ public class OrderRepoImpl implements OrderRepo {
             int affectedRow = psIntoOrders.executeUpdate();
             if (affectedRow == 0) throw new SQLException("Failed to save order, no rows affected");
 
-            try (ResultSet rs=psIntoOrders.getGeneratedKeys()){
-                while (rs.next()){
+            try (ResultSet rs = psIntoOrders.getGeneratedKeys()) {
+                while (rs.next()) {
                     order.setId(rs.getLong("id"));
                 }
             }
@@ -53,7 +54,14 @@ public class OrderRepoImpl implements OrderRepo {
             for (IMenuItem item : order.getItemList()) {
                 psIntoOrdersMenuitems.setLong(1, order.getId());
                 psIntoOrdersMenuitems.setLong(2, item.getId());
-                psIntoOrdersMenuitems.executeUpdate();
+                psIntoOrdersMenuitems.addBatch();
+            }
+
+            int[] batchResults = psIntoOrdersMenuitems.executeBatch();
+            for (int result : batchResults) {
+                if (result == Statement.EXECUTE_FAILED) {
+                    throw new SQLException("Failed to execute batch insert.");
+                }
             }
 
             return order;
