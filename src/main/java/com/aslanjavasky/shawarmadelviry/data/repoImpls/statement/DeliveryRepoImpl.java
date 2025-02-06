@@ -94,9 +94,6 @@ public class DeliveryRepoImpl implements DeliveryRepo {
                     delivery.setOrder(orderRepo.getOrderById(rs.getLong("order_id")));
                 }
             }
-            int affectedRow = ps.executeUpdate();
-            if (affectedRow == 0) throw new SQLException("Failed to get delivery, no rows affected");
-
             return delivery;
         } catch (SQLException e) {
             throw new RuntimeException(e);
