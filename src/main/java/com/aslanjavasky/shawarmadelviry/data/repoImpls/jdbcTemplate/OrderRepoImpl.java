@@ -4,22 +4,28 @@ import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Repository("ORwJT")
 public class OrderRepoImpl implements OrderRepo {
 
-    private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
     private final MenuItemRepo menuItemRepo;
     private final UserRepoImpl userRepoImpl;
 
-    public OrderRepoImpl(DataSource dataSource, @Qualifier("MRwJT") MenuItemRepo menuItemRepo, @Qualifier("URwJT") UserRepoImpl userRepoImpl) {
-        this.dataSource = dataSource;
+    public OrderRepoImpl(JdbcTemplate jdbcTemplate, @Qualifier("MRwJT") MenuItemRepo menuItemRepo, @Qualifier("URwJT") UserRepoImpl userRepoImpl) {
+        this.jdbcTemplate = jdbcTemplate;
         this.menuItemRepo = menuItemRepo;
         this.userRepoImpl = userRepoImpl;
     }
@@ -32,51 +38,26 @@ public class OrderRepoImpl implements OrderRepo {
         String sqlOrder = "INSERT INTO orders(date_time, status, user_id, total_price) VALUES(?,?,?,?);";
         String sqlOrderMenuitems = "INSERT INTO orders_menu_items(order_id, menu_item_id) VALUES(?,?);";
 
-        try (Connection connection = dataSource.getConnection()) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        int affectedRow = jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sqlOrder, new String[]{"id"});
+            ps.setTimestamp(1, Timestamp.valueOf(order.getDateTime()));
+            ps.setString(2, order.getStatus().name());
+            ps.setLong(3, order.getUser().getId());
+            ps.setBigDecimal(4, order.getTotalPrice());
+            return ps;
+        }, keyHolder);
 
-            connection.setAutoCommit(false);
+        if (affectedRow == 0) throw new RuntimeException("Failed to save order, no rows affected");
 
-            try (PreparedStatement psIntoOrders = connection.prepareStatement(
-                    sqlOrder, Statement.RETURN_GENERATED_KEYS);
-                 PreparedStatement psIntoOrdersMenuitems = connection.prepareStatement(sqlOrderMenuitems);
-            ) {
-                psIntoOrders.setTimestamp(1, Timestamp.valueOf(order.getDateTime()));
-                psIntoOrders.setString(2, order.getStatus().name());
-                psIntoOrders.setLong(3, order.getUser().getId());
-                psIntoOrders.setBigDecimal(4, order.getTotalPrice());
+        order.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
 
-                int affectedRow = psIntoOrders.executeUpdate();
-                if (affectedRow == 0) throw new SQLException("Failed to save order, no rows affected");
-
-                try (ResultSet rs = psIntoOrders.getGeneratedKeys()) {
-                    while (rs.next()) {
-                        order.setId(rs.getLong("id"));
-                    }
-                }
-
-                for (IMenuItem item : order.getItemList()) {
-                    psIntoOrdersMenuitems.setLong(1, order.getId());
-                    psIntoOrdersMenuitems.setLong(2, item.getId());
-                    psIntoOrdersMenuitems.addBatch();
-                }
-
-                int[] batchResults = psIntoOrdersMenuitems.executeBatch();
-                for (int result : batchResults) {
-                    if (result == Statement.EXECUTE_FAILED) {
-                        throw new SQLException("Failed to execute batch insert.");
-                    }
-                }
-                connection.commit();
-                return order;
-
-            } catch (SQLException e) {
-                connection.rollback();
-                e.printStackTrace();
-                return null;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        List<Object[]> batchArgs = new ArrayList<>();
+        for (IMenuItem item : order.getItemList()) {
+            batchArgs.add(new Object[]{order.getId(), item.getId()});
         }
+        jdbcTemplate.batchUpdate(sqlOrderMenuitems, batchArgs);
+        return order;
     }
 
     @Override
