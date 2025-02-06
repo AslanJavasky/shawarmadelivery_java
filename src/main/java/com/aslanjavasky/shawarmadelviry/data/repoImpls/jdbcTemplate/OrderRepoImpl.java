@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -66,22 +67,11 @@ public class OrderRepoImpl implements OrderRepo {
         if (order == null) throw new IllegalArgumentException("order cannot be null");
 
         String sql = "UPDATE orders SET date_time=?, status=?, user_id=?, total_price=?  WHERE id=?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)
-        ) {
-            ps.setTimestamp(1, Timestamp.valueOf(order.getDateTime()));
-            ps.setString(2, order.getStatus().name());
-            ps.setLong(3, order.getUser().getId());
-            ps.setBigDecimal(4, order.getTotalPrice());
-            ps.setLong(5, order.getId());
 
-            int affectedRow = ps.executeUpdate();
-            if (affectedRow == 0) throw new SQLException("Failed to update order, no rows affected");
+        int affectedRow = jdbcTemplate.update(sql, Timestamp.valueOf(order.getDateTime()), order.getStatus().name(), order.getUser().getId(), order.getTotalPrice(), order.getId());
 
-            return order;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        if (affectedRow == 0) throw new RuntimeException("Failed to update order, no rows affected");
+        return order;
     }
 
     @Override
@@ -90,19 +80,10 @@ public class OrderRepoImpl implements OrderRepo {
         if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
 
         String sql = "UPDATE orders SET status=? WHERE id=?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)
-        ) {
-            ps.setString(1, status.name());
-            ps.setLong(2, orderId);
 
-            int affectedRow = ps.executeUpdate();
-            if (affectedRow == 0) throw new SQLException("Failed to update order status, no rows affected");
-
-            return getOrderById(orderId);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        int affectedRow = jdbcTemplate.update(sql, status.name(), orderId);
+        if (affectedRow == 0) throw new RuntimeException("Failed to update order status, no rows affected");
+        return getOrderById(orderId);
     }
 
 
@@ -113,87 +94,48 @@ public class OrderRepoImpl implements OrderRepo {
 
         List<IOrder> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders WHERE user_id=?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)
-        ) {
-            ps.setLong(1, user.getId());
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Long orderId = rs.getLong("id");
-                    IOrder order = getOrderById(orderId);
-                    if (order != null) orders.add(order);
-                }
-            }
-
-            return orders;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return jdbcTemplate.query(sql, new Object[]{user.getId()}, (rs, numRow) -> {
+            Long orderId = rs.getLong("id");
+            return getOrderById(orderId);
+        });
     }
+
 
     @Override
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
-        List<IOrder> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders WHERE status=?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)
-        ) {
-            ps.setString(1, orderStatus.name());
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Long orderId = rs.getLong("id");
-                    IOrder order = getOrderById(orderId);
-                    if (order != null) orders.add(order);
-                }
-            }
-
-            return orders;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return jdbcTemplate.query(sql, new Object[]{orderStatus.name()}, (rs, numRow) -> {
+            Long orderId = rs.getLong("id");
+            return getOrderById(orderId);
+        });
     }
-
 
     public IOrder getOrderById(Long orderId) {
 
         if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
 
         String sql = "SELECT * FROM orders WHERE id=?";
-        String sqlFromOrdersMenuItems = "SELECT * FROM orders_menu_items WHERE order_id=?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql);
-             PreparedStatement psFromOrdersMenuItems = connection.prepareStatement(sqlFromOrdersMenuItems)
-        ) {
-            ps.setLong(1, orderId);
-            Order order = new Order();
-            try (ResultSet rs = ps.executeQuery()) {
 
-                while (rs.next()) {
-                    order.setId(rs.getLong("id"));
-                    order.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
-                    order.setStatus(OrderStatus.valueOf(rs.getString("status")));
-                    order.setUser(userRepoImpl.getUserById(rs.getLong("user_id")));
-                    order.setTotalPrice(rs.getBigDecimal("total_price"));
-                }
-            }
-            psFromOrdersMenuItems.setLong(1, orderId);
-            List<IMenuItem> menuItems = new ArrayList<>();
-            try (ResultSet rs = psFromOrdersMenuItems.executeQuery()) {
-                while (rs.next()) {
-                    IMenuItem menuItem = new MenuItem();
-                    Long menuItemId = rs.getLong("menu_item_id");
-                    menuItem = menuItemRepo.getMenuItemById(menuItemId);
-                    if (menuItem != null) menuItems.add(menuItem);
-                }
-            }
-            order.setItemList(menuItems);
+        return jdbcTemplate.queryForObject(sql, new Object[]{orderId}, (rs, numRow) -> {
+            IOrder order = new Order();
+            order.setId(rs.getLong("id"));
+            order.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
+            order.setStatus(OrderStatus.valueOf(rs.getString("status")));
+            order.setUser(userRepoImpl.getUserById(rs.getLong("user_id")));
+            order.setTotalPrice(rs.getBigDecimal("total_price"));
+            order.setItemList(getMenuItemsForOrder(order.getId()));
             return order;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        });
     }
 
+    private List<IMenuItem> getMenuItemsForOrder(Long orderId) {
+        String sql = "SELECT * FROM orders_menu_items WHERE order_id=?";
 
+        return jdbcTemplate.query(sql, new Object[]{orderId}, (rs, numRow) -> {
+            Long menuItemId = rs.getLong("menu_item_id");
+            return menuItemRepo.getMenuItemById(menuItemId);
+        });
+    }
 }

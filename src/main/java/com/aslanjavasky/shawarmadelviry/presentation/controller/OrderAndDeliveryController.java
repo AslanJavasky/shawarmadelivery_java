@@ -78,7 +78,7 @@ public class OrderAndDeliveryController {
 
         orderService.createOrder(delivery.getOrder());
         deliveryService.createDelivery(delivery);
-        userService.createUser(user);
+        userService.updateUser(user);
         return "redirect:/menu";
     }
 }
