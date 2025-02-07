@@ -3,6 +3,7 @@ package com.aslanjavasky.shawarmadelviry.conf;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -74,7 +75,8 @@ public class ApplicationStartupRunner implements CommandLineRunner {
                 new MenuItem(23L,"Шаурма L", MenuSection.MAIN_MENU, BigDecimal.valueOf(240)));
         menuItemRepo.saveMenuItem(
                 new MenuItem(24L,"Шаурма XL", MenuSection.MAIN_MENU, BigDecimal.valueOf(290)));
-    }
+
+     }
 
 
 }

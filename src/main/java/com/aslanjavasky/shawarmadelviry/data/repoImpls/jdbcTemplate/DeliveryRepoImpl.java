@@ -72,7 +72,7 @@ public class DeliveryRepoImpl implements DeliveryRepo {
 
         String sql = "SELECT * FROM deliveries WHERE id=?";
 
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, numRow) -> {
+        return jdbcTemplate.queryForStream(sql, (rs, numRow) -> {
             IDelivery delivery = new Delivery();
             delivery.setId(rs.getLong("id"));
             delivery.setAddress(rs.getString("address"));
@@ -81,7 +81,7 @@ public class DeliveryRepoImpl implements DeliveryRepo {
             delivery.setOrder(orderRepo.getOrderById(rs.getLong("order_id")));
 
             return delivery;
-        });
+        }, id).findFirst().orElse(null);
 
     }
 }

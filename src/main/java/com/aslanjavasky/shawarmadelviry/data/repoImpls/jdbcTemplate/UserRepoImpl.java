@@ -4,14 +4,13 @@ import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
+import java.util.List;
 import java.sql.*;
 import java.util.Objects;
 
@@ -65,7 +64,6 @@ public class UserRepoImpl implements UserRepo {
     public void deleteUserByEmail(String email) {
         if (email == null) throw new IllegalArgumentException("Email cannot be null");
         String sql = "DELETE FROM users WHERE email = ? ";
-
         int affectedRow = jdbcTemplate.update(sql, email);
         if (affectedRow == 0) throw new RuntimeException("Failed to delete user, no rows affected");
     }
@@ -73,19 +71,70 @@ public class UserRepoImpl implements UserRepo {
 
     @Override
     public IUser getUserByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email= ? ";
+//        1)queryForObject
+//        String sql = "SELECT * FROM users WHERE email= ? ";
+//        return jdbcTemplate.queryForObject(sql, new Object[]{email}, (rs, rowNum) -> {
+//            User user = new User();
+//            user.setId(rs.getLong("id"));
+//            user.setName(rs.getString("name"));
+//            user.setEmail(rs.getString("email"));
+//            user.setPassword(rs.getString("password"));
+//            user.setTelegram(rs.getString("telegram"));
+//            user.setPhone(rs.getString("phone"));
+//            user.setAddress(rs.getString("address"));
+//            return user;
+//        });
 
-        return jdbcTemplate.queryForObject(sql, new Object[]{email}, (rs, rowNum) -> {
-            User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setName(rs.getString("name"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            user.setTelegram(rs.getString("telegram"));
-            user.setPhone(rs.getString("phone"));
-            user.setAddress(rs.getString("address"));
-            return user;
-        });
+//        2)query(sql, ParamArgs,ResultSetExtractor )
+//        String sql = "SELECT * FROM users WHERE email= ? ";
+//        return jdbcTemplate.query(sql, new Object[]{email}, rs -> {
+//            while (rs.next()) {
+//                User user = new User();
+//                user.setId(rs.getLong("id"));
+//                user.setName(rs.getString("name"));
+//                user.setEmail(rs.getString("email"));
+//                user.setPassword(rs.getString("password"));
+//                user.setTelegram(rs.getString("telegram"));
+//                user.setPhone(rs.getString("phone"));
+//                user.setAddress(rs.getString("address"));
+//                return user;
+//            }
+//            return null;
+//        });
+
+//        3)query(sql, RowMapper)
+//        String sql = "SELECT * FROM users WHERE email=? ";
+//        return jdbcTemplate.query(sql, (rs, numRow) -> {
+//            if (rs.next()) {
+//                User user = new User();
+//                user.setId(rs.getLong("id"));
+//                user.setName(rs.getString("name"));
+//                user.setEmail(rs.getString("email"));
+//                user.setPassword(rs.getString("password"));
+//                user.setTelegram(rs.getString("telegram"));
+//                user.setPhone(rs.getString("phone"));
+//                user.setAddress(rs.getString("address"));
+//                return user;
+//            }
+//            return null;
+//        }).stream().findFirst().orElse(null);
+
+//        4) query(sql, BeanPropertyRowMapper)
+//        String sql = "SELECT * FROM users WHERE email= ? ";
+//        return jdbcTemplate.query(
+//                sql,
+//                new Object[]{email},
+//                new BeanPropertyRowMapper<>(User.class))
+//                .stream().findFirst().orElse(null);
+
+        // 5) queryForStream(sql, BeanPropertyRowMapper)
+        String sql = "SELECT * FROM users WHERE email= ? ";
+        return jdbcTemplate.queryForStream(
+                        sql,
+                        new BeanPropertyRowMapper<>(User.class),
+                        new Object[]{email})
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -106,18 +155,26 @@ public class UserRepoImpl implements UserRepo {
 
     public IUser getUserById(long id) {
         String sql = "SELECT * FROM users WHERE id=?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
-            User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setName(rs.getString("name"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            user.setTelegram(rs.getString("telegram"));
-            user.setPhone(rs.getString("phone"));
-            user.setAddress(rs.getString("address"));
+        return jdbcTemplate
+                .queryForStream(
+                        sql,new BeanPropertyRowMapper<>(User.class),new Object[]{id})
+                .findFirst()
+                .orElse(null);
 
-            return user;
-        });
+
+
+//        return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
+//            User user = new User();
+//            user.setId(rs.getLong("id"));
+//            user.setName(rs.getString("name"));
+//            user.setEmail(rs.getString("email"));
+//            user.setPassword(rs.getString("password"));
+//            user.setTelegram(rs.getString("telegram"));
+//            user.setPhone(rs.getString("phone"));
+//            user.setAddress(rs.getString("address"));
+//
+//            return user;
+//        });
     }
 
 }
