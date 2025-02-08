@@ -19,13 +19,10 @@ import java.util.*;
 public class OrderRepoImpl implements OrderRepo {
 
     private final JdbcTemplate jdbcTemplate;
-    private final MenuItemRepo menuItemRepo;
-    private final UserRepoImpl userRepoImpl;
 
-    public OrderRepoImpl(JdbcTemplate jdbcTemplate, @Qualifier("MRwJT") MenuItemRepo menuItemRepo, @Qualifier("URwJT") UserRepoImpl userRepoImpl) {
+
+    public OrderRepoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.menuItemRepo = menuItemRepo;
-        this.userRepoImpl = userRepoImpl;
     }
 
     @Override
