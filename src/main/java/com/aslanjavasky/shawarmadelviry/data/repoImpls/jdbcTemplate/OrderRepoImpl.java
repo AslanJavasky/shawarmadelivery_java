@@ -6,6 +6,7 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -88,12 +89,32 @@ public class OrderRepoImpl implements OrderRepo {
 
         if (user == null) throw new IllegalArgumentException("user cannot be null");
 
-        List<IOrder> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders WHERE user_id=?";
+        String sql = """
+                SELECT
+                O.id AS order_id,
+                U.id AS user_id,
+                U.name AS user_name,
+                U.email,
+                U.password,
+                U.telegram,
+                U.phone,
+                U.address,
+                O.date_time,
+                O.status,
+                O.total_price
+                FROM orders O
+                JOIN users U ON O.user_id=U.id
+                WHERE O.user_id=?
+                ORDER BY O.id
+                """;
 
-        return jdbcTemplate.query(sql, (rs, numRow) -> {
-            Long orderId = rs.getLong("id");
-            return getOrderById(orderId);
+        return jdbcTemplate.query(sql, new RowMapper<IOrder>() {
+            @Override
+            public IOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
+                IOrder order = createOrderFromRS(rs);
+                order.setUser(createUserFromRS(rs));
+                return order;
+            }
         }, user.getId());
     }
 
@@ -135,7 +156,7 @@ public class OrderRepoImpl implements OrderRepo {
                                 newOrder.setUser(createUserFromRS(rs));
                                 newOrder.setItemList(new ArrayList<IMenuItem>());
                                 return newOrder;
-                            }catch (SQLException e){
+                            } catch (SQLException e) {
                                 throw new RuntimeException("Failed to get order by status");
                             }
                         });
@@ -157,7 +178,7 @@ public class OrderRepoImpl implements OrderRepo {
     }
 
     private IOrder createOrderFromRS(ResultSet rs) throws SQLException {
-        IOrder newOrder=new Order();
+        IOrder newOrder = new Order();
         newOrder.setId(rs.getLong("order_id"));
         newOrder.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
         newOrder.setStatus(OrderStatus.valueOf(rs.getString("status")));
@@ -176,7 +197,6 @@ public class OrderRepoImpl implements OrderRepo {
         user.setAddress(rs.getString("address"));
         return user;
     }
-
 
 
     public IOrder getOrderById(Long orderId) {
