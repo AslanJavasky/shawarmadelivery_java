@@ -5,19 +5,13 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Repository("ORwJT")
@@ -106,20 +100,84 @@ public class OrderRepoImpl implements OrderRepo {
 
     @Override
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
-        String sql = "SELECT * FROM orders WHERE status=?";
-        //TODO
-        return jdbcTemplate.query(sql, (rs, numRow) -> {
-            IOrder order = new Order();
-            order.setId(rs.getLong("id"));
-            order.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
-            order.setStatus(OrderStatus.valueOf(rs.getString("status")));
-            order.setUser(userRepoImpl.getUserById(rs.getLong("user_id")));
-            order.setTotalPrice(rs.getBigDecimal("total_price"));
-            order.setItemList(getMenuItemsForOrder(order.getId()));
-            return order;
+        String sql = """
+                SELECT 
+                    U.id AS user_id,
+                    U.name AS user_name,
+                    U.email,
+                    U.password,
+                    U.telegram,
+                    U.phone, 
+                    U.address,
+                    OMI.menu_item_id,
+                    MI.name as menu_item_name,
+                    MI.menu_section,
+                    MI.price,
+                    OMI.order_id,
+                    O.date_time,
+                    O.status,
+                    O.total_price
+                FROM orders O
+                JOIN users U ON O.user_id=U.id
+                JOIN orders_menu_items OMI ON O.id=OMI.order_id
+                JOIN menu_items MI ON MI.id=OMI.menu_item_id
+                WHERE O.status=?
+                ORDER BY O.id
+                """;
+        return jdbcTemplate.query(sql,
+                (rs) -> {
+                    Map<Long, IOrder> orderMap = new LinkedHashMap<>();
+                    while (rs.next()) {
+                        Long orderId = rs.getLong("order_id");
+                        IOrder order = orderMap.computeIfAbsent(orderId, id -> {
+                            try {
+                                IOrder newOrder = createOrderFromRS(rs);
+                                newOrder.setUser(createUserFromRS(rs));
+                                newOrder.setItemList(new ArrayList<IMenuItem>());
+                                return newOrder;
+                            }catch (SQLException e){
+                                throw new RuntimeException("Failed to get order by status");
+                            }
+                        });
+                        order.getItemList().add(createMenuItemFromRS(rs));
+                    }
+                    return new ArrayList<>(orderMap.values());
+                },
+                orderStatus.name());
 
-        }, orderStatus.name());
     }
+
+    private MenuItem createMenuItemFromRS(ResultSet rs) throws SQLException {
+        MenuItem menuItem = new MenuItem();
+        menuItem.setId(rs.getLong("menu_item_id"));
+        menuItem.setName(rs.getString("menu_item_name"));
+        menuItem.setMenuSection(MenuSection.valueOf(rs.getString("menu_section")));
+        menuItem.setPrice(rs.getBigDecimal("price"));
+        return menuItem;
+    }
+
+    private IOrder createOrderFromRS(ResultSet rs) throws SQLException {
+        IOrder newOrder=new Order();
+        newOrder.setId(rs.getLong("order_id"));
+        newOrder.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
+        newOrder.setStatus(OrderStatus.valueOf(rs.getString("status")));
+        newOrder.setTotalPrice(rs.getBigDecimal("total_price"));
+        return newOrder;
+    }
+
+    private IUser createUserFromRS(ResultSet rs) throws SQLException {
+        IUser user = new User();
+        user.setId(rs.getLong("user_id"));
+        user.setName(rs.getString("user_name"));
+        user.setEmail(rs.getString("email"));
+        user.setPassword(rs.getString("password"));
+        user.setTelegram(rs.getString("telegram"));
+        user.setPhone(rs.getString("phone"));
+        user.setAddress(rs.getString("address"));
+        return user;
+    }
+
+
 
     public IOrder getOrderById(Long orderId) {
 
@@ -142,9 +200,9 @@ public class OrderRepoImpl implements OrderRepo {
     private List<IMenuItem> getMenuItemsForOrder(Long orderId) {
         String sql = "SELECT * FROM orders_menu_items WHERE order_id=?";
 
-        return jdbcTemplate.query(sql,  (rs, numRow) -> {
+        return jdbcTemplate.query(sql, (rs, numRow) -> {
             Long menuItemId = rs.getLong("menu_item_id");
             return menuItemRepo.getMenuItemById(menuItemId);
-        },orderId);
+        }, orderId);
     }
 }
