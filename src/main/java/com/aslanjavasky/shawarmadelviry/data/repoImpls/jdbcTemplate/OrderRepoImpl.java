@@ -168,6 +168,50 @@ public class OrderRepoImpl implements OrderRepo {
 
     }
 
+
+    public IOrder getOrderById(Long orderId) {
+
+        if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
+
+        String sql = """
+                SELECT 
+                    U.id AS user_id,
+                    U.name AS user_name,
+                    U.email,
+                    U.password,
+                    U.telegram,
+                    U.phone, 
+                    U.address,
+                    OMI.menu_item_id,
+                    MI.name as menu_item_name,
+                    MI.menu_section,
+                    MI.price,
+                    OMI.order_id,
+                    O.date_time,
+                    O.status,
+                    O.total_price
+                FROM orders O
+                JOIN users U ON O.user_id=U.id
+                JOIN orders_menu_items OMI ON O.id=OMI.order_id
+                JOIN menu_items MI ON MI.id=OMI.menu_item_id
+                WHERE O.id=?
+                ORDER BY O.id
+                """;
+
+        return jdbcTemplate.query(sql, (rs) -> {
+            IOrder order=null;
+            while (rs.next()) {
+                if (order == null){
+                    order = createOrderFromRS(rs);
+                    order.setUser(createUserFromRS(rs));
+                    order.setItemList(new ArrayList<>());
+                }
+                order.getItemList().add(createMenuItemFromRS(rs));
+            }
+            return order;
+        }, orderId);
+    }
+
     private MenuItem createMenuItemFromRS(ResultSet rs) throws SQLException {
         MenuItem menuItem = new MenuItem();
         menuItem.setId(rs.getLong("menu_item_id"));
@@ -196,33 +240,5 @@ public class OrderRepoImpl implements OrderRepo {
         user.setPhone(rs.getString("phone"));
         user.setAddress(rs.getString("address"));
         return user;
-    }
-
-
-    public IOrder getOrderById(Long orderId) {
-
-        if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
-
-        String sql = "SELECT * FROM orders WHERE id=?";
-
-        return jdbcTemplate.query(sql, (rs, numRow) -> {
-            IOrder order = new Order();
-            order.setId(rs.getLong("id"));
-            order.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
-            order.setStatus(OrderStatus.valueOf(rs.getString("status")));
-            order.setUser(userRepoImpl.getUserById(rs.getLong("user_id")));
-            order.setTotalPrice(rs.getBigDecimal("total_price"));
-            order.setItemList(getMenuItemsForOrder(order.getId()));
-            return order;
-        }, orderId).stream().findFirst().orElse(null);
-    }
-
-    private List<IMenuItem> getMenuItemsForOrder(Long orderId) {
-        String sql = "SELECT * FROM orders_menu_items WHERE order_id=?";
-
-        return jdbcTemplate.query(sql, (rs, numRow) -> {
-            Long menuItemId = rs.getLong("menu_item_id");
-            return menuItemRepo.getMenuItemById(menuItemId);
-        }, orderId);
     }
 }
