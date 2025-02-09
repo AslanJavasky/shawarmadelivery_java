@@ -7,6 +7,10 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -14,16 +18,17 @@ import org.springframework.stereotype.Repository;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 @Repository("MRwNPJT")
 public class MenuItemRepoImpl implements MenuItemRepo {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public MenuItemRepoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public MenuItemRepoImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
     @Override
@@ -31,23 +36,22 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
         if (menuItem == null) throw new IllegalArgumentException("menuItem cannot be null");
 
-        String sql = "INSERT INTO menu_items (id, name, menu_section, price) VALUES(?,?,?,?) " +
+        String sql = "INSERT INTO menu_items (id, name, menu_section, price) " +
+                "VALUES(:id,:name,:menu_section,:price) " +
                 "ON CONFLICT (id) DO " +
                 "UPDATE SET name=EXCLUDED.name,menu_section=EXCLUDED.menu_section,price=EXCLUDED.price";
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
-                ps.setLong(1, menuItem.getId());
-                ps.setString(2, menuItem.getName());
-                ps.setString(3, menuItem.getMenuSection().name());
-                ps.setBigDecimal(4, menuItem.getPrice());
-                return ps;
-            }
-        }, keyHolder);
-        menuItem.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+//        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        int affectedRow = namedParameterJdbcTemplate.update(
+                sql,
+                new BeanPropertySqlParameterSource(menuItem)
+//                keyHolder,
+//                new String[]{"id"}
+        );
+        if (affectedRow == 0) throw new RuntimeException("Failed to save menuItem, no rows affected");
+
+//        menuItem.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
 
         return menuItem;
     }
@@ -58,13 +62,12 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
         if (menuItem == null) throw new IllegalArgumentException("menuItem cannot be null");
 
-        String sql = "UPDATE menu_items SET name=?, menu_section=?, price=? WHERE id=?;";
+        String sql = "UPDATE menu_items SET name = :name, menu_section = :menu_section, " +
+                "price = :price WHERE id = :id;";
 
-        int affectedRow = jdbcTemplate.update(
+        int affectedRow = namedParameterJdbcTemplate.update(
                 sql,
-                menuItem.getName(), menuItem.getMenuSection().name(), menuItem.getPrice(), menuItem.getId());
-
-
+                new BeanPropertySqlParameterSource(menuItem));
         if (affectedRow == 0) throw new RuntimeException("Failed to update menuItem, no rows affected");
         return menuItem;
     }
@@ -75,7 +78,6 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
         if (id == null) throw new IllegalArgumentException("Id cannot be null");
 
-        String sql = "SELECT * FROM menu_items WHERE id=?;";
 
 //        return jdbcTemplate.queryForStream(
 //                        sql,
@@ -92,13 +94,19 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 //                .findFirst()
 //                .orElse(null);
 
+        String sql = "SELECT * FROM menu_items WHERE id = :id";
 
-        return jdbcTemplate.queryForStream(
-                        sql,
-                        new BeanPropertyRowMapper<>(MenuItem.class),
-                        id)
-                .findFirst()
-                .orElse(null);
+        return namedParameterJdbcTemplate.queryForObject(
+                sql,
+                new MapSqlParameterSource("id", id),
+                new BeanPropertyRowMapper<>(MenuItem.class));
+
+//        return namedParameterJdbcTemplate.queryForStream(
+//                        sql,
+//                        new MapSqlParameterSource("id", id),
+//                        new BeanPropertyRowMapper<>(MenuItem.class))
+//                .findFirst()
+//                .orElse(null);
 
 //        return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, rowNum) -> {
 //            MenuItem menuItem = new MenuItem();
@@ -113,11 +121,14 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
     @Override
     public List<IMenuItem> getMenuItemsBySection(MenuSection section) {
-        String sql = "SELECT * FROM menu_items WHERE menu_section = ?";
-        return jdbcTemplate.queryForStream(
+        String sql = "SELECT * FROM menu_items WHERE menu_section = :menu_section";
+        return namedParameterJdbcTemplate.queryForStream(
                 sql,
-                new BeanPropertyRowMapper<>(MenuItem.class),
-                section.name()).map(item -> (IMenuItem) item).toList();
+                new MapSqlParameterSource("menu_section",section.name()),
+                new BeanPropertyRowMapper<>(MenuItem.class))
+                .map(item -> (IMenuItem) item).toList();
+
+
 
 //        return jdbcTemplate.query(sql, new Object[]{section.name()}, (rs, numRow) -> {
 //            MenuItem menuItem = new MenuItem();
@@ -132,8 +143,9 @@ public class MenuItemRepoImpl implements MenuItemRepo {
     @Override
     public void deleteMenuItem(IMenuItem menuItem) {
         if (menuItem == null) throw new IllegalArgumentException("Menu Item cannot be null");
-        String sql = "DELETE FROM menu_items WHERE id=?";
-        int affectedRow = jdbcTemplate.update(sql, menuItem.getId());
+        String sql = "DELETE FROM menu_items WHERE id = :id";
+        int affectedRow = namedParameterJdbcTemplate.update(
+                sql, new MapSqlParameterSource("id",menuItem.getId()));
         if (affectedRow == 0) throw new RuntimeException("Failed to delete menuItem, no rows affected");
 
     }
@@ -141,6 +153,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
     @Override
     public void deleteAll() {
         String sql = "DELETE FROM menu_items";
-        jdbcTemplate.update(sql);
+        int affectedRow = namedParameterJdbcTemplate.update(sql, new HashMap<>());
+        if (affectedRow == 0) throw new RuntimeException("Failed to delete all menuItems, no rows affected");
     }
 }
