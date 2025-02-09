@@ -1,4 +1,4 @@
-package com.aslanjavasky.shawarmadelviry.data.repoImpls.jdbcTemplate;
+package com.aslanjavasky.shawarmadelviry.data.repoImpls.namedParamJdbcTemplate;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
@@ -9,11 +9,14 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 @Slf4j
-@Repository("ORwJT")
+@Repository("ORwNPJT")
 public class OrderRepoImpl implements OrderRepo {
 
     private final JdbcTemplate jdbcTemplate;

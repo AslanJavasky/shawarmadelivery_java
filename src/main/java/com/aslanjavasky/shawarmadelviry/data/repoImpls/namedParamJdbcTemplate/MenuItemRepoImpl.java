@@ -1,4 +1,4 @@
-package com.aslanjavasky.shawarmadelviry.data.repoImpls.jdbcTemplate;
+package com.aslanjavasky.shawarmadelviry.data.repoImpls.namedParamJdbcTemplate;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
@@ -10,11 +10,14 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-@Repository("MRwJT")
+@Repository("MRwNPJT")
 public class MenuItemRepoImpl implements MenuItemRepo {
 
     private final JdbcTemplate jdbcTemplate;
