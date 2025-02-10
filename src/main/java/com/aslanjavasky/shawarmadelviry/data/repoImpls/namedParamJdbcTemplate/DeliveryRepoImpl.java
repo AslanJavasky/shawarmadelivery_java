@@ -5,6 +5,9 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.DeliveryRepo;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -14,15 +17,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Repository("DRwNPJT")
 public class DeliveryRepoImpl implements DeliveryRepo {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public DeliveryRepoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public DeliveryRepoImpl(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
     @Override
@@ -30,18 +35,19 @@ public class DeliveryRepoImpl implements DeliveryRepo {
 
         if (delivery == null) throw new IllegalArgumentException("Delivery cannot be null");
 
-        String sql = "INSERT INTO deliveries(address, phone, date_time, order_id) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO deliveries(address, phone, date_time, order_id) " +
+                "VALUES(:address, :phone, :date_time, :order_id)";
+
+        SqlParameterSource params = new MapSqlParameterSource()
+                .addValue("address", delivery.getAddress())
+                .addValue("phone", delivery.getPhone())
+                .addValue("date_time", delivery.getDateTime())
+                .addValue("order_id", delivery.getOrder().getId());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        int affectedRow = jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
-            ps.setString(1, delivery.getAddress());
-            ps.setString(2, delivery.getPhone());
-            ps.setTimestamp(3, Timestamp.valueOf(delivery.getDateTime()));
-            ps.setLong(4, delivery.getOrder().getId());
+        int affectedRow =
+                namedParameterJdbcTemplate.update(sql, params, keyHolder, new String[]{"id"});
 
-            return ps;
-        }, keyHolder);
 
         delivery.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         return delivery;
@@ -52,14 +58,20 @@ public class DeliveryRepoImpl implements DeliveryRepo {
 
         if (delivery == null) throw new IllegalArgumentException("Delivery cannot be null");
 
-        String sql = "UPDATE deliveries SET address= ? , phone=? , date_time= ?, order_id=? WHERE id=?";
+        String sql = "UPDATE deliveries SET address = :address , phone = :phone , " +
+                "date_time = :date_time, order_id = :order_id WHERE id = :id";
 
-        int affectedRow = jdbcTemplate.update(sql,
-                delivery.getAddress(),
-                delivery.getPhone(),
-                Timestamp.valueOf(delivery.getDateTime()),
-                delivery.getOrder().getId(),
-                delivery.getId());
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("address", delivery.getAddress());
+        paramMap.put("phone", delivery.getPhone());
+        paramMap.put("date_time", delivery.getDateTime());
+        paramMap.put("order_id", delivery.getOrder().getId());
+        paramMap.put("id", delivery.getId());
+
+        SqlParameterSource params=new MapSqlParameterSource()
+                .addValues(paramMap);
+
+        int affectedRow = namedParameterJdbcTemplate.update(sql, params);
         if (affectedRow == 0) throw new RuntimeException("Failed to update delivery, no rows affected");
 
         return delivery;
@@ -94,15 +106,18 @@ public class DeliveryRepoImpl implements DeliveryRepo {
                 JOIN users U ON U.id=O.user_id 
                 JOIN orders_menu_items OMI ON O.id=OMI.order_id
                 JOIN menu_items	MI ON OMI.menu_item_id=MI.id
-                WHERE D.id=?
+                WHERE D.id = :id
                 ORDER BY D.id
                 """;
-        return jdbcTemplate.query(sql, new ResultSetExtractor<IDelivery>() {
+        return namedParameterJdbcTemplate.query(
+                sql,
+                new MapSqlParameterSource("id",id),
+                new ResultSetExtractor<IDelivery>() {
             @Override
             public IDelivery extractData(ResultSet rs) throws SQLException, DataAccessException {
-                IDelivery delivery=null;
-                while (rs.next()){
-                    if (delivery == null){
+                IDelivery delivery = null;
+                while (rs.next()) {
+                    if (delivery == null) {
                         delivery = createDeliveryFromRS(rs);
                         delivery.setOrder(createOrderFromRS(rs));
                         delivery.getOrder().setUser(createUserFromRS(rs));
@@ -110,13 +125,13 @@ public class DeliveryRepoImpl implements DeliveryRepo {
                     }
                     delivery.getOrder().getItemList().add(createMenuItemFromRS(rs));
                 }
-                if (delivery == null){
-                    throw new RuntimeException("No delivery found with id:"+id);
+                if (delivery == null) {
+                    throw new RuntimeException("No delivery found with id:" + id);
                 }
                 return delivery;
 
             }
-        }, id);
+        });
     }
 
     private MenuItem createMenuItemFromRS(ResultSet rs) throws SQLException {
@@ -150,7 +165,7 @@ public class DeliveryRepoImpl implements DeliveryRepo {
     }
 
     private IDelivery createDeliveryFromRS(ResultSet rs) throws SQLException {
-        IDelivery delivery=new Delivery();
+        IDelivery delivery = new Delivery();
         delivery.setId(rs.getLong("delivery_id"));
         delivery.setAddress(rs.getString("address"));
         delivery.setPhone(rs.getString("phone"));
