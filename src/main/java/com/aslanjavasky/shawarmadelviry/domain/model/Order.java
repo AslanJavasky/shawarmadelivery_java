@@ -13,5 +13,4 @@ public class Order implements IOrder {
     private IUser user;
     private List<IMenuItem> itemList;
     private BigDecimal totalPrice;
-
 }
