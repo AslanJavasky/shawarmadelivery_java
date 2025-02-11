@@ -10,7 +10,7 @@ public class UserService extends UserInterractor {
 
     private UserRepo userRepo;
 
-    public UserService(@Qualifier("URwNPJT") UserRepo userRepo) {
+    public UserService(@Qualifier("URwJOOQ") UserRepo userRepo) {
         super(userRepo);
     }
 
