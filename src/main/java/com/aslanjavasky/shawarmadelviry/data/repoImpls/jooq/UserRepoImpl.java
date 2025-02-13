@@ -34,7 +34,7 @@ public class UserRepoImpl implements UserRepo {
                 .returning(USERS.ID)
                 .fetchOne();
         if (record == null) throw new RuntimeException("Failed to save user");
-        user.setId(Long.valueOf(record.getId()));
+        user.setId(record.getId());
         return user;
     }
 
