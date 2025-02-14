@@ -86,31 +86,49 @@ public class OrderRepoImpl implements OrderRepo {
 
         String sql = """
                 SELECT
-                O.id AS order_id,
-                U.id AS user_id,
-                U.name AS user_name,
-                U.email,
-                U.password,
-                U.telegram,
-                U.phone,
-                U.address,
-                O.date_time,
-                O.status,
-                O.total_price
+                  O.id AS order_id,
+                  U.id AS user_id,
+                  U.name AS user_name,
+                  U.email,
+                  U.password,
+                  U.telegram,
+                  U.phone,
+                  U.address,
+                  O.date_time,
+                  O.status,
+                  O.total_price,
+                  MI.id AS menu_item_id,
+                  MI.name AS menu_item_name,
+                  MI.menu_section,
+                  MI.price
                 FROM orders O
                 JOIN users U ON O.user_id=U.id
-                WHERE O.user_id=?
+                JOIN orders_menu_items OMI ON OMI.order_id=O.id
+                JOIN menu_items MI ON MI.id=OMI.menu_item_id
+                WHERE O.user_id = ?
                 ORDER BY O.id
                 """;
 
-        return jdbcTemplate.query(sql, new RowMapper<IOrder>() {
-            @Override
-            public IOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-                IOrder order = createOrderFromRS(rs);
-                order.setUser(createUserFromRS(rs));
-                return order;
-            }
-        }, user.getId());
+        return jdbcTemplate.query(sql,
+                (rs) -> {
+                    Map<Long, IOrder> orderMap = new LinkedHashMap<>();
+                    while (rs.next()) {
+                        Long orderId = rs.getLong("order_id");
+                        IOrder order = orderMap.computeIfAbsent(orderId, id -> {
+                            try {
+                                IOrder newOrder = createOrderFromRS(rs);
+                                newOrder.setUser(createUserFromRS(rs));
+                                newOrder.setItemList(new ArrayList<IMenuItem>());
+                                return newOrder;
+                            } catch (SQLException e) {
+                                throw new RuntimeException("Failed to get order by status");
+                            }
+                        });
+                        order.getItemList().add(createMenuItemFromRS(rs));
+                    }
+                    return new ArrayList<>(orderMap.values());
+                },
+                user.getId());
     }
 
 
@@ -194,9 +212,9 @@ public class OrderRepoImpl implements OrderRepo {
                 """;
 
         return jdbcTemplate.query(sql, (rs) -> {
-            IOrder order=null;
+            IOrder order = null;
             while (rs.next()) {
-                if (order == null){
+                if (order == null) {
                     order = createOrderFromRS(rs);
                     order.setUser(createUserFromRS(rs));
                     order.setItemList(new ArrayList<>());

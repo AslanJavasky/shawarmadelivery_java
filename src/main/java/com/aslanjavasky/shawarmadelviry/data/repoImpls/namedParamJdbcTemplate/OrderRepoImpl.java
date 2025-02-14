@@ -3,7 +3,9 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.namedParamJdbcTemplate;
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -106,19 +108,25 @@ public class OrderRepoImpl implements OrderRepo {
 
         String sql = """
                 SELECT
-                O.id AS order_id,
-                U.id AS user_id,
-                U.name AS user_name,
-                U.email,
-                U.password,
-                U.telegram,
-                U.phone,
-                U.address,
-                O.date_time,
-                O.status,
-                O.total_price
+                  O.id AS order_id,
+                  U.id AS user_id,
+                  U.name AS user_name,
+                  U.email,
+                  U.password,
+                  U.telegram,
+                  U.phone,
+                  U.address,
+                  O.date_time,
+                  O.status,
+                  O.total_price,
+                  MI.id AS menu_item_id,
+                  MI.name AS menu_item_name,
+                  MI.menu_section,
+                  MI.price
                 FROM orders O
                 JOIN users U ON O.user_id=U.id
+                JOIN orders_menu_items OMI ON OMI.order_id=O.id
+                JOIN menu_items MI ON MI.id=OMI.menu_item_id
                 WHERE O.user_id = :user_id
                 ORDER BY O.id
                 """;
@@ -126,14 +134,28 @@ public class OrderRepoImpl implements OrderRepo {
         return namedParameterJdbcTemplate.query(
                 sql,
                 new MapSqlParameterSource("user_id", user.getId()),
-                new RowMapper<IOrder>() {
+                new ResultSetExtractor<List<IOrder>>() {
                     @Override
-                    public IOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        IOrder order = createOrderFromRS(rs);
-                        order.setUser(createUserFromRS(rs));
-                        return order;
+                    public List<IOrder> extractData(ResultSet rs) throws SQLException, DataAccessException {
+                        Map<Long, IOrder> orderMap = new LinkedHashMap<>();
+                        while (rs.next()) {
+                            Long orderId = rs.getLong("order_id");
+                            IOrder order = orderMap.computeIfAbsent(orderId, id -> {
+                                try {
+                                    IOrder newOrder = createOrderFromRS(rs);
+                                    newOrder.setUser(createUserFromRS(rs));
+                                    newOrder.setItemList(new ArrayList<IMenuItem>());
+                                    return newOrder;
+                                } catch (SQLException e) {
+                                    throw new RuntimeException("Failed to get order by status");
+                                }
+                            });
+                            order.getItemList().add(createMenuItemFromRS(rs));
+                        }
+                        return new ArrayList<>(orderMap.values());
                     }
                 });
+
     }
 
 
@@ -220,19 +242,19 @@ public class OrderRepoImpl implements OrderRepo {
 
         return namedParameterJdbcTemplate.query(
                 sql,
-                new MapSqlParameterSource("order_id",orderId),
+                new MapSqlParameterSource("order_id", orderId),
                 (rs) -> {
-            IOrder order = null;
-            while (rs.next()) {
-                if (order == null) {
-                    order = createOrderFromRS(rs);
-                    order.setUser(createUserFromRS(rs));
-                    order.setItemList(new ArrayList<>());
-                }
-                order.getItemList().add(createMenuItemFromRS(rs));
-            }
-            return order;
-        });
+                    IOrder order = null;
+                    while (rs.next()) {
+                        if (order == null) {
+                            order = createOrderFromRS(rs);
+                            order.setUser(createUserFromRS(rs));
+                            order.setItemList(new ArrayList<>());
+                        }
+                        order.getItemList().add(createMenuItemFromRS(rs));
+                    }
+                    return order;
+                });
     }
 
     private MenuItem createMenuItemFromRS(ResultSet rs) throws SQLException {

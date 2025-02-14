@@ -2,37 +2,23 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.jooq;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
-import com.aslanjavasky.shawarmadelviry.generated.jooq.tables.Orders;
-import com.aslanjavasky.shawarmadelviry.generated.jooq.tables.OrdersMenuItems;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.jooq.DSLContext;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.jooq.Record;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 
-import static com.aslanjavasky.shawarmadelviry.generated.jooq.Tables.ORDERS;
-import static com.aslanjavasky.shawarmadelviry.generated.jooq.Tables.ORDERS_MENU_ITEMS;
+import static com.aslanjavasky.shawarmadelviry.generated.jooq.Tables.*;
 
 @Slf4j
 @Repository("ORwJOOQ")
 public class OrderRepoImpl implements OrderRepo {
 
     private final DSLContext dslContext;
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public OrderRepoImpl(DSLContext dslContext, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public OrderRepoImpl(DSLContext dslContext) {
         this.dslContext = dslContext;
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
     @Override
@@ -52,10 +38,10 @@ public class OrderRepoImpl implements OrderRepo {
         if (orderId == null) throw new RuntimeException("Failed to save orders, no generated key");
         order.setId(orderId);
 
-        var queryCollection=order.getItemList().stream()
+        var queryCollection = order.getItemList().stream()
                 .map(item -> dslContext.insertInto(ORDERS_MENU_ITEMS)
-                        .set(ORDERS_MENU_ITEMS.ORDER_ID,order.getId())
-                        .set(ORDERS_MENU_ITEMS.MENU_ITEM_ID,item.getId()))
+                        .set(ORDERS_MENU_ITEMS.ORDER_ID, order.getId())
+                        .set(ORDERS_MENU_ITEMS.MENU_ITEM_ID, item.getId()))
                 .toList();
 
         dslContext.batch(queryCollection).execute();
@@ -66,19 +52,14 @@ public class OrderRepoImpl implements OrderRepo {
     public IOrder updateOrder(IOrder order) {
 
         if (order == null) throw new IllegalArgumentException("order cannot be null");
-
-        String sql = "UPDATE orders SET date_time = :date_time, status = :status, " +
-                "user_id = :user_id, total_price = :total_price WHERE id = :id";
-        SqlParameterSource params = new MapSqlParameterSource()
-                .addValue("date_time", Timestamp.valueOf(order.getDateTime()))
-                .addValue("status", order.getStatus().name())
-                .addValue("user_id", order.getUser().getId())
-                .addValue("total_price", order.getTotalPrice())
-                .addValue("id", order.getId());
-
-        int affectedRow = namedParameterJdbcTemplate.update(sql, params);
-
-        if (affectedRow == 0) throw new RuntimeException("Failed to update order, no rows affected");
+        int affectedRow = dslContext.update(ORDERS)
+                .set(ORDERS.DATE_TIME, order.getDateTime())
+                .set(ORDERS.STATUS, order.getStatus().name())
+                .set(ORDERS.USER_ID, order.getUser().getId())
+                .set(ORDERS.TOTAL_PRICE, order.getTotalPrice())
+                .where(ORDERS.ID.eq(order.getId()))
+                .execute();
+        if (affectedRow == 0) throw new RuntimeException("Failed to update order, no rows   affected");
         return order;
     }
 
@@ -86,13 +67,10 @@ public class OrderRepoImpl implements OrderRepo {
     public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
 
         if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
-
-        String sql = "UPDATE orders SET status = :status WHERE id = :id";
-
-        SqlParameterSource params = new MapSqlParameterSource()
-                .addValue("status", status.name())
-                .addValue("id", orderId);
-        int affectedRow = namedParameterJdbcTemplate.update(sql, params);
+        int affectedRow = dslContext.update(ORDERS)
+                .set(ORDERS.STATUS, status.name())
+                .where(ORDERS.ID.eq(orderId))
+                .execute();
         if (affectedRow == 0) throw new RuntimeException("Failed to update order status, no rows affected");
         return getOrderById(orderId);
     }
@@ -103,88 +81,89 @@ public class OrderRepoImpl implements OrderRepo {
 
         if (user == null) throw new IllegalArgumentException("user cannot be null");
 
-        String sql = """
-                SELECT
-                O.id AS order_id,
-                U.id AS user_id,
-                U.name AS user_name,
-                U.email,
-                U.password,
-                U.telegram,
-                U.phone,
-                U.address,
-                O.date_time,
-                O.status,
-                O.total_price
-                FROM orders O
-                JOIN users U ON O.user_id=U.id
-                WHERE O.user_id = :user_id
-                ORDER BY O.id
-                """;
-
-        return namedParameterJdbcTemplate.query(
-                sql,
-                new MapSqlParameterSource("user_id", user.getId()),
-                new RowMapper<IOrder>() {
-                    @Override
-                    public IOrder mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        IOrder order = createOrderFromRS(rs);
-                        order.setUser(createUserFromRS(rs));
-                        return order;
+        return dslContext.select(
+                        USERS.ID.as("user_id"),
+                        USERS.NAME.as("user_name"),
+                        USERS.EMAIL,
+                        USERS.PASSWORD,
+                        USERS.TELEGRAM,
+                        USERS.PHONE,
+                        USERS.ADDRESS,
+                        ORDERS.DATE_TIME,
+                        ORDERS.STATUS,
+                        ORDERS.TOTAL_PRICE,
+                        ORDERS_MENU_ITEMS.MENU_ITEM_ID,
+                        ORDERS_MENU_ITEMS.ORDER_ID,
+                        MENU_ITEMS.NAME.as("menu_item_name"),
+                        MENU_ITEMS.MENU_SECTION,
+                        MENU_ITEMS.PRICE
+                )
+                .from(ORDERS)
+                .join(USERS).on(ORDERS.USER_ID.eq(USERS.ID))
+                .join(ORDERS_MENU_ITEMS).on(ORDERS.ID.eq(ORDERS_MENU_ITEMS.ORDER_ID))
+                .join(MENU_ITEMS).on(ORDERS_MENU_ITEMS.MENU_ITEM_ID.eq(MENU_ITEMS.ID))
+                .where(USERS.ID.eq(user.getId()))
+                .orderBy(ORDERS.ID)
+                .fetchGroups(ORDERS_MENU_ITEMS.ORDER_ID)
+                .values()
+                .stream()
+                .map(records -> {
+                    IOrder order = null;
+                    for (Record record : records) {
+                        if (order == null) {
+                            order = createOrderFromRecord(record);
+                            order.setUser(createUserFromRecord(record));
+                            order.setItemList(new ArrayList<>());
+                        }
+                        order.getItemList().add(createMenuItemFromRecord(record));
                     }
-                });
+                    return order;
+                })
+                .toList();
     }
 
 
     @Override
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
-        String sql = """
-                SELECT 
-                    U.id AS user_id,
-                    U.name AS user_name,
-                    U.email,
-                    U.password,
-                    U.telegram,
-                    U.phone, 
-                    U.address,
-                    OMI.menu_item_id,
-                    MI.name as menu_item_name,
-                    MI.menu_section,
-                    MI.price,
-                    OMI.order_id,
-                    O.date_time,
-                    O.status,
-                    O.total_price
-                FROM orders O
-                JOIN users U ON O.user_id=U.id
-                JOIN orders_menu_items OMI ON O.id=OMI.order_id
-                JOIN menu_items MI ON MI.id=OMI.menu_item_id
-                WHERE O.status= :order_status
-                ORDER BY O.id
-                """;
 
-        return namedParameterJdbcTemplate.query(
-                sql,
-                new MapSqlParameterSource("order_status", orderStatus.name()),
-                (rs) -> {
-                    Map<Long, IOrder> orderMap = new LinkedHashMap<>();
-                    while (rs.next()) {
-                        Long orderId = rs.getLong("order_id");
-                        IOrder order = orderMap.computeIfAbsent(orderId, id -> {
-                            try {
-                                IOrder newOrder = createOrderFromRS(rs);
-                                newOrder.setUser(createUserFromRS(rs));
-                                newOrder.setItemList(new ArrayList<IMenuItem>());
-                                return newOrder;
-                            } catch (SQLException e) {
-                                throw new RuntimeException("Failed to get order by status");
-                            }
-                        });
-                        order.getItemList().add(createMenuItemFromRS(rs));
+        return dslContext.select(
+                        USERS.ID.as("user_id"),
+                        USERS.NAME.as("user_name"),
+                        USERS.EMAIL,
+                        USERS.PASSWORD,
+                        USERS.TELEGRAM,
+                        USERS.PHONE,
+                        USERS.ADDRESS,
+                        ORDERS_MENU_ITEMS.MENU_ITEM_ID,
+                        MENU_ITEMS.NAME.as("menu_item_name"),
+                        MENU_ITEMS.MENU_SECTION,
+                        MENU_ITEMS.PRICE,
+                        ORDERS_MENU_ITEMS.ORDER_ID,
+                        ORDERS.DATE_TIME,
+                        ORDERS.STATUS,
+                        ORDERS.TOTAL_PRICE)
+                .from(ORDERS)
+                .join(USERS).on(ORDERS.USER_ID.eq(USERS.ID))
+                .join(ORDERS_MENU_ITEMS).on(ORDERS.ID.eq(ORDERS_MENU_ITEMS.ORDER_ID))
+                .join(MENU_ITEMS).on(MENU_ITEMS.ID.eq(ORDERS_MENU_ITEMS.MENU_ITEM_ID))
+                .where(ORDERS.STATUS.eq(orderStatus.name()))
+                .orderBy(ORDERS.ID)
+                .fetchGroups(ORDERS_MENU_ITEMS.ORDER_ID)
+                .values()
+                .stream()
+                .map(records -> {
+                    IOrder order = null;
+                    for (Record record : records) {
+                        if (order == null) {
+                            order = createOrderFromRecord(record);
+                            order.setUser(createUserFromRecord(record));
+                            order.setItemList(new ArrayList<>());
+                        }
+                        order.getItemList().add(createMenuItemFromRecord(record));
                     }
-                    return new ArrayList<>(orderMap.values());
-                });
-
+                    return order;
+                })
+                .toList();
     }
 
 
@@ -192,75 +171,75 @@ public class OrderRepoImpl implements OrderRepo {
 
         if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");
 
-        String sql = """
-                SELECT 
-                    U.id AS user_id,
-                    U.name AS user_name,
-                    U.email,
-                    U.password,
-                    U.telegram,
-                    U.phone, 
-                    U.address,
-                    OMI.menu_item_id,
-                    MI.name as menu_item_name,
-                    MI.menu_section,
-                    MI.price,
-                    OMI.order_id,
-                    O.date_time,
-                    O.status,
-                    O.total_price
-                FROM orders O
-                JOIN users U ON O.user_id=U.id
-                JOIN orders_menu_items OMI ON O.id=OMI.order_id
-                JOIN menu_items MI ON MI.id=OMI.menu_item_id
-                WHERE O.id = :order_id
-                ORDER BY O.id
-                """;
-
-        return namedParameterJdbcTemplate.query(
-                sql,
-                new MapSqlParameterSource("order_id", orderId),
-                (rs) -> {
+        return dslContext.select(
+                        USERS.ID.as("user_id"),
+                        USERS.NAME.as("user_name"),
+                        USERS.EMAIL,
+                        USERS.PASSWORD,
+                        USERS.TELEGRAM,
+                        USERS.PHONE,
+                        USERS.ADDRESS,
+                        ORDERS_MENU_ITEMS.MENU_ITEM_ID,
+                        MENU_ITEMS.NAME.as("menu_item_name"),
+                        MENU_ITEMS.MENU_SECTION,
+                        MENU_ITEMS.PRICE,
+                        ORDERS_MENU_ITEMS.ORDER_ID,
+                        ORDERS.DATE_TIME,
+                        ORDERS.STATUS,
+                        ORDERS.TOTAL_PRICE)
+                .from(ORDERS)
+                .join(USERS).on(ORDERS.USER_ID.eq(USERS.ID))
+                .join(ORDERS_MENU_ITEMS).on(ORDERS.ID.eq(ORDERS_MENU_ITEMS.ORDER_ID))
+                .join(MENU_ITEMS).on(MENU_ITEMS.ID.eq(ORDERS_MENU_ITEMS.MENU_ITEM_ID))
+                .where(ORDERS.ID.eq(orderId))
+                .orderBy(ORDERS.ID)
+                .fetchGroups(ORDERS_MENU_ITEMS.ORDER_ID)
+                .values()
+                .stream()
+                .map(records -> {
                     IOrder order = null;
-                    while (rs.next()) {
+                    for (Record record : records) {
                         if (order == null) {
-                            order = createOrderFromRS(rs);
-                            order.setUser(createUserFromRS(rs));
+                            order = createOrderFromRecord(record);
+                            order.setUser(createUserFromRecord(record));
                             order.setItemList(new ArrayList<>());
                         }
-                        order.getItemList().add(createMenuItemFromRS(rs));
+                        order.getItemList().add(createMenuItemFromRecord(record));
                     }
                     return order;
-                });
+                })
+                .findFirst().orElse(null);
+
     }
 
-    private MenuItem createMenuItemFromRS(ResultSet rs) throws SQLException {
+    private IMenuItem createMenuItemFromRecord(Record record) {
         MenuItem menuItem = new MenuItem();
-        menuItem.setId(rs.getLong("menu_item_id"));
-        menuItem.setName(rs.getString("menu_item_name"));
-        menuItem.setMenuSection(MenuSection.valueOf(rs.getString("menu_section")));
-        menuItem.setPrice(rs.getBigDecimal("price"));
+        menuItem.setId(record.get(ORDERS_MENU_ITEMS.MENU_ITEM_ID));
+        menuItem.setName(record.get("menu_item_name", String.class));
+        menuItem.setMenuSection(MenuSection.valueOf(record.get(MENU_ITEMS.MENU_SECTION)));
+        menuItem.setPrice(record.get(MENU_ITEMS.PRICE));
         return menuItem;
     }
 
-    private IOrder createOrderFromRS(ResultSet rs) throws SQLException {
-        IOrder newOrder = new Order();
-        newOrder.setId(rs.getLong("order_id"));
-        newOrder.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
-        newOrder.setStatus(OrderStatus.valueOf(rs.getString("status")));
-        newOrder.setTotalPrice(rs.getBigDecimal("total_price"));
-        return newOrder;
+
+    private IUser createUserFromRecord(Record record) {
+        IUser user = new User();
+        user.setId(record.get("user_id", Long.class));
+        user.setName(record.get("user_name", String.class));
+        user.setEmail(record.get(USERS.EMAIL));
+        user.setPassword(record.get(USERS.PASSWORD));
+        user.setTelegram(record.get(USERS.TELEGRAM));
+        user.setPhone(record.get(USERS.PHONE));
+        user.setAddress(record.get(USERS.ADDRESS));
+        return user;
     }
 
-    private IUser createUserFromRS(ResultSet rs) throws SQLException {
-        IUser user = new User();
-        user.setId(rs.getLong("user_id"));
-        user.setName(rs.getString("user_name"));
-        user.setEmail(rs.getString("email"));
-        user.setPassword(rs.getString("password"));
-        user.setTelegram(rs.getString("telegram"));
-        user.setPhone(rs.getString("phone"));
-        user.setAddress(rs.getString("address"));
-        return user;
+    private IOrder createOrderFromRecord(Record record) {
+        IOrder order = new Order();
+        order.setId(record.get("order_id", Long.class));
+        order.setDateTime(record.get(ORDERS.DATE_TIME));
+        order.setStatus(OrderStatus.valueOf(record.get(ORDERS.STATUS)));
+        order.setTotalPrice(record.get(ORDERS.TOTAL_PRICE));
+        return order;
     }
 }

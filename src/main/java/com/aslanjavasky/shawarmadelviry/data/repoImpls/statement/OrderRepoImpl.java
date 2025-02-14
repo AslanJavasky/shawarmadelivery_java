@@ -131,7 +131,30 @@ public class OrderRepoImpl implements OrderRepo {
         if (user == null) throw new IllegalArgumentException("user cannot be null");
 
         List<IOrder> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders WHERE user_id=?";
+        String sql = """
+                SELECT
+                  O.id AS order_id,
+                  U.id AS user_id,
+                  U.name AS user_name,
+                  U.email,
+                  U.password,
+                  U.telegram,
+                  U.phone,
+                  U.address,
+                  O.date_time,
+                  O.status,
+                  O.total_price,
+                  MI.id AS menu_item_id,
+                  MI.name AS menu_item_name,
+                  MI.menu_section,
+                  MI.price
+                FROM orders O
+                JOIN users U ON O.user_id=U.id
+                JOIN orders_menu_items OMI ON OMI.order_id=O.id
+                JOIN menu_items MI ON MI.id=OMI.menu_item_id
+                WHERE O.user_id = ?
+                ORDER BY O.id
+                """;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)
         ) {
@@ -139,12 +162,36 @@ public class OrderRepoImpl implements OrderRepo {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Long orderId = rs.getLong("id");
-                    IOrder order = getOrderById(orderId);
-                    if (order != null) orders.add(order);
+                    IOrder order = null;
+                    if (order == null) {
+                        order.setId(rs.getLong("order_id"));
+                        order.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
+                        order.setStatus(OrderStatus.valueOf(rs.getString("status")));
+                        order.setTotalPrice(rs.getBigDecimal("total_price"));
+
+                        IUser _user = new User();
+                        _user.setId(rs.getLong("user_id"));
+                        _user.setAddress(rs.getString("address"));
+                        _user.setEmail(rs.getString("email"));
+                        _user.setName(rs.getString("user_name"));
+                        _user.setPassword(rs.getString("password"));
+                        _user.setPhone(rs.getString("phone"));
+                        _user.setTelegram(rs.getString("telegram"));
+                        order.setUser(_user);
+
+                        order.setItemList(new ArrayList<>());
+                    }
+                    IMenuItem menuItem=new MenuItem();
+                    menuItem.setId(rs.getLong("menu_item_id"));
+                    menuItem.setMenuSection(MenuSection.valueOf(rs.getString("menu_section")));
+                    menuItem.setName(rs.getString("menu_item_name"));
+                    menuItem.setPrice(rs.getBigDecimal("price"));
+
+                    order.getItemList().add(menuItem);
+
+                    orders.add(order);
                 }
             }
-
             return orders;
         } catch (SQLException e) {
             throw new RuntimeException(e);
