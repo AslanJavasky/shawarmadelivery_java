@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DeliveryService extends DeliveryInterractor {
-    public DeliveryService(@Qualifier("DRwNPJT") DeliveryRepo repo) {
+    public DeliveryService(@Qualifier("DRwJOOQ") DeliveryRepo repo) {
         super(repo);
     }
 }
