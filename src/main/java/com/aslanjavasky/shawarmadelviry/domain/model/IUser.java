@@ -5,6 +5,7 @@ import lombok.ToString;
 
 
 public interface IUser {
+
     Long getId();
 
     void setId(Long id);

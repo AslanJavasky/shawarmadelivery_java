@@ -3,11 +3,15 @@ package com.aslanjavasky.shawarmadelviry.presentation.service.dto;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
+@Table("users")
 public class UserDto implements IUser {
+    @Id
     private Long id;
     @NotBlank(message = "Name required")
     private String name;

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MenuItemService extends MenuItemInterractor {
 
-    public MenuItemService (@Qualifier("MRwJOOQ") MenuItemRepo repo) {
+    public MenuItemService (@Qualifier("MenuItemRepoAdapter_CRUD") MenuItemRepo repo) {
         super(repo);
     }
 }
