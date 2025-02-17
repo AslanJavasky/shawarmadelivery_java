@@ -7,7 +7,6 @@ import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -19,4 +18,8 @@ public interface MenuItemRepository extends CrudRepository<MenuItemEntity, Long>
     @Query("INSERT INTO menu_items (id, name, menu_section, price) VALUES (:id, :name, :menu_section, :price)")
     void insert(@Param("id") Long id, @Param("name") String name,
                 @Param("menu_section") MenuSection menuSection, @Param("price") BigDecimal price);
+
+    @Query("SELECT menu_item_id FROM orders_menu_items WHERE order_id = :order_id")
+    List<Long> getMenuItemsByOrderId(@Param("order_id") Long orderId);
+    //todo
 }
