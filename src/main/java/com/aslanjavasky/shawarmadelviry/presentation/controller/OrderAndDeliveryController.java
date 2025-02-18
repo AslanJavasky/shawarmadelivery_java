@@ -69,14 +69,14 @@ public class OrderAndDeliveryController {
         order.setTotalPrice(sessionInfoService.getTotalPrice());
         order.setDateTime(LocalDateTime.now());
         order.setUser(user);
+        Order savedOrder = (Order) orderService.createOrder(order);
 
         Delivery delivery = new Delivery();
         delivery.setDateTime(LocalDateTime.now());
         delivery.setPhone(sessionInfoService.getPhone());
         delivery.setAddress(sessionInfoService.getAddress());
-        delivery.setOrder(order);
+        delivery.setOrder(savedOrder);
 
-        orderService.createOrder(delivery.getOrder());
         deliveryService.createDelivery(delivery);
         userService.updateUser(user);
         return "redirect:/menu";

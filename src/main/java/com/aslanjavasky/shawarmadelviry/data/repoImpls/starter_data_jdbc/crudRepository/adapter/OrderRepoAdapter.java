@@ -99,7 +99,7 @@ public class OrderRepoAdapter implements OrderRepo {
         }).toList();
     }
 
-    private IOrder getOrderById(Long orderId) {
+    public IOrder getOrderById(Long orderId) {
 
         OrderEntity orderEntity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
