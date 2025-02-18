@@ -92,7 +92,7 @@ public class OrderRepoAdapter implements OrderRepo {
 
     @Override
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
-        List<OrderEntity> orderEntities = orderRepository.getOrdersByStatus(orderStatus);
+        List<OrderEntity> orderEntities = orderRepository.getByStatus(orderStatus);
 
         return orderEntities.stream().map(orderEntity -> {
             return getOrderById(orderEntity.getId());

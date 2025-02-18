@@ -34,7 +34,7 @@ public class UserRepoAdapter implements UserRepo {
 
     @Override
     public void deleteUserByEmail(String email) {
-        UserEntity user = userRepository.getUserByEmail(email);
+        UserEntity user = userRepository.findByEmail(email);
         if (user != null) {
             userRepository.delete(user);
         } else {
@@ -44,7 +44,7 @@ public class UserRepoAdapter implements UserRepo {
 
     @Override
     public IUser getUserByEmail(String email) {
-        return userRepository.getUserByEmail(email);
+        return userRepository.findByEmail(email);
     }
 
     @Override
