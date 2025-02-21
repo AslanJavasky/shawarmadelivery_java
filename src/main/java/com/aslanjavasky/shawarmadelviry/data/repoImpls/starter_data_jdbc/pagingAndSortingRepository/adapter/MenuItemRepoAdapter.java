@@ -6,6 +6,7 @@ import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.pagingA
 import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,7 +21,7 @@ public class MenuItemRepoAdapter implements MenuItemRepo {
     private final MenuItemPSRepository menuItemPSRepository;
     private final MenuItemMapper mapper;
 
-    public MenuItemRepoAdapter(MenuItemPSRepository menuItemPSRepository, MenuItemMapper mapper) {
+    public MenuItemRepoAdapter(@Qualifier("MenuItemRepoExtPSRepo") MenuItemPSRepository menuItemPSRepository, MenuItemMapper mapper) {
         this.menuItemPSRepository = menuItemPSRepository;
         this.mapper = mapper;
     }

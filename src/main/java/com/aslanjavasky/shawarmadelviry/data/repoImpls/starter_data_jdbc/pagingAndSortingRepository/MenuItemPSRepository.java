@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Repository
+@Repository("MenuItemRepoExtPSRepo")
 public interface MenuItemPSRepository extends PagingAndSortingRepository<MenuItemEntity, Long>,
                                                 MenuItemRepository {
 
