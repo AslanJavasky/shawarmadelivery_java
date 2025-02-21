@@ -1,8 +1,8 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.adapter;
 
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.MenuItemRepository;
-import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.entity.MenuItemEntity;
-import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.mapper.MenuItemMapper;
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.MenuItemEntity;
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.mapper.MenuItemMapper;
 import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;

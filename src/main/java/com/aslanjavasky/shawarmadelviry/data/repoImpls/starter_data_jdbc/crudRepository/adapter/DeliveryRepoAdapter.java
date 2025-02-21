@@ -1,8 +1,8 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.adapter;
 
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.DeliveryRepository;
-import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.entity.DeliveryEntity;
-import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.mapper.DeliveryMapper;
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.DeliveryEntity;
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.mapper.DeliveryMapper;
 import com.aslanjavasky.shawarmadelviry.domain.model.IDelivery;
 import com.aslanjavasky.shawarmadelviry.domain.repo.DeliveryRepo;
 import lombok.extern.slf4j.Slf4j;

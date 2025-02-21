@@ -1,8 +1,7 @@
-package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.mapper;
+package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.mapper;
 
-import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.crudRepository.entity.UserEntity;
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.UserEntity;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
-import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
