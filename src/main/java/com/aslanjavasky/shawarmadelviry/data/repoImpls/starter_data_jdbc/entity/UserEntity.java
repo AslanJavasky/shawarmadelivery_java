@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+//ORM-Object Relational Mapping
+//Hibernate - Как это нужно сделать?
+//JPA - что нужно сделать?
+
 @Data @AllArgsConstructor @NoArgsConstructor
 @Table("users")
 public class UserEntity implements IUser {
