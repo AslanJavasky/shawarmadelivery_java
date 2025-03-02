@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
+
+//1:1 @OneToOne @JoinColumn
+//1:N @OneToMany @JoinColumn
+//N:1 @ManyToOne @JoinColumn
+//N:M @ManyToMany @JoinTable
 
 @Data
 @NoArgsConstructor
@@ -25,7 +29,7 @@ public class DeliveryEntity {
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 

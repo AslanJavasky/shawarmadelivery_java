@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,14 +27,14 @@ public class OrderEntity {
     @Column(nullable = false)
     private OrderStatus status;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
     @Column(name = "total_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal totalPrice;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "orders_menu_items",
             joinColumns = @JoinColumn(name = "order_id"),
