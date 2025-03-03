@@ -3,6 +3,7 @@
 --DROP TABLE IF EXISTS orders;
 --DROP TABLE IF EXISTS orders_menu_items;
 --DROP TABLE IF EXISTS deliveries;
+--DROP TABLE users,menu_items,orders,orders_menu_items,deliveries;
 
 CREATE TABLE IF NOT EXISTS users(
 	id BIGSERIAL PRIMARY KEY,
