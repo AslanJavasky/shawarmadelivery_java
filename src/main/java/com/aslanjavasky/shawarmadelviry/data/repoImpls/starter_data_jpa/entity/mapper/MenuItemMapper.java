@@ -5,7 +5,7 @@ import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component("MenuItemM_JPA")
 public class MenuItemMapper {
 
     private final ModelMapper modelMapper;
