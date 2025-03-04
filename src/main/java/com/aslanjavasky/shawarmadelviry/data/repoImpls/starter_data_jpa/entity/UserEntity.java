@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity;
 
+import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +10,7 @@ import java.util.List;
 @Data @NoArgsConstructor @AllArgsConstructor
 @Entity(name = "users")
 //@Table(name = "users")
-public class UserEntity {
+public class UserEntity implements IUser {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

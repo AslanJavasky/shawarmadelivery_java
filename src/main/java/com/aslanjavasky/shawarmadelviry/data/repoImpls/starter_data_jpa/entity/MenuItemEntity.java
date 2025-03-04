@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity;
 
+import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.model.Order;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Entity(name = "menu_items")
-public class MenuItemEntity {
+public class MenuItemEntity implements IMenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

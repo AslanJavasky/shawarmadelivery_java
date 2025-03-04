@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity;
 
+import com.aslanjavasky.shawarmadelviry.domain.model.IOrder;
 import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Entity(name = "orders")
-public class OrderEntity {
+public class OrderEntity  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
