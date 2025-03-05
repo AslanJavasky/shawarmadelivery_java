@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -29,7 +30,7 @@ public class MenuItemEntity implements IMenuItem {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-//    @ManyToMany(mappedBy = "itemList")
-//    private List<OrderEntity> orders;
+//    @ManyToMany(mappedBy = "itemList", cascade = CascadeType.ALL)
+//    private List<OrderEntity> orders = new ArrayList<>();
 
 }

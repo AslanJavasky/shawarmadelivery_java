@@ -28,7 +28,7 @@ public class OrderEntity  {
     @Column(nullable = false)
     private OrderStatus status;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
