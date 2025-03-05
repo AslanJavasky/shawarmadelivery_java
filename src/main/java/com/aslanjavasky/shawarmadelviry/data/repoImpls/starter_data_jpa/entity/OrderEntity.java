@@ -1,6 +1,8 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity;
 
+import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.IOrder;
+import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Entity(name = "orders")
-public class OrderEntity  {
+public class OrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +45,7 @@ public class OrderEntity  {
     )
     private List<MenuItemEntity> itemList;
 
-//    @OneToOne(mappedBy = "order")
+
+    //    @OneToOne(mappedBy = "order")
 //    private DeliveryEntity delivery;
 }
