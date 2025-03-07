@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.List;
 import java.math.BigDecimal;
@@ -17,6 +20,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Entity(name = "orders")
+@EntityListeners(AuditingEntityListener.class)
 public class OrderEntity {
 
     @Id
@@ -30,7 +34,7 @@ public class OrderEntity {
     @Column(nullable = false)
     private OrderStatus status;
 
-    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
@@ -45,6 +49,25 @@ public class OrderEntity {
     )
     private List<MenuItemEntity> itemList;
 
+    @Version
+    private int version;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     //    @OneToOne(mappedBy = "order")
 //    private DeliveryEntity delivery;

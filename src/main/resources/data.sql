@@ -2,7 +2,7 @@ INSERT INTO users VALUES
 (1,'Aslan Javasky', 'Aslan@com','$2a$10$Lo4UiZysZZG0Giglk2zlWOAPMEmB67qkBCGqIiCB7uYFeBPCFeCIi','@Aslan_Javasky','89999999999','г.Черкесск, ул.Ленина, д.1')
 ON CONFLICT(id) DO NOTHING;
 
-INSERT INTO menu_items VALUES
+INSERT INTO menu_items(id, name, menu_section, price) VALUES
 (1, 'Гиро в лаваше L', 'MAIN_MENU', 240.00),
 (2, 'Гиро в лаваше XL', 'MAIN_MENU', 290.00),
 (3, 'Гиро в лепешке', 'MAIN_MENU', 240.00),
