@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -19,6 +21,8 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Entity(name = "menu_items")
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "menu_cache")
 public class MenuItemEntity extends BaseEntity implements IMenuItem {
 
     @Column(nullable = false)

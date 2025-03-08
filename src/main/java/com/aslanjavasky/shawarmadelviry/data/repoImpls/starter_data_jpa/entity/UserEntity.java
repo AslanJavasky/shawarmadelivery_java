@@ -5,10 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.JavaType;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.Cache;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -28,6 +26,8 @@ import java.util.List;
 //@Inheritance(strategy = InheritanceType.JOINED)
 //@DiscriminatorColumn(name = "user_type")
 //@Table(name = "users", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserEntity extends BaseEntity implements IUser {
     //    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
 //    @SequenceGenerator(name = "user_seq_gen", sequenceName = "user_seq", allocationSize = 1)
