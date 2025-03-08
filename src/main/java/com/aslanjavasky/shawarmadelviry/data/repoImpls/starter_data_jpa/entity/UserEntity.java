@@ -18,15 +18,22 @@ import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data @NoArgsConstructor @AllArgsConstructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 //@EntityListeners(AuditingEntityListener.class)
 @Entity(name = "users")
+//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+//@Inheritance(strategy = InheritanceType.JOINED)
+//@DiscriminatorColumn(name = "user_type")
 //@Table(name = "users", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-public class UserEntity implements IUser {
-//    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
+public class UserEntity extends BaseEntity implements IUser {
+    //    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
 //    @SequenceGenerator(name = "user_seq_gen", sequenceName = "user_seq", allocationSize = 1)
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
 
     @Column(nullable = false)
 //    @Basic(optional = false,fetch = FetchType.EAGER)
@@ -48,22 +55,7 @@ public class UserEntity implements IUser {
 //    @Formula("(SELECT COUNT(*) FROM users)")
 //    transient private Long userCount;
 
-//    @CreatedDate
-//    private LocalDateTime createdAt;
-//
-//    @LastModifiedDate
-//    private LocalDateTime updatedAt;
-//
-//    @PrePersist (@PostPersist, @PreUpdate, @PostUpdate, @PreRemove, @PostRemove)
-//    public void prePersist(){
-//        this.createdAt=LocalDateTime.now();
-//        this.updatedAt=LocalDateTime.now();
-//    }
-//
-//    @PreUpdate
-//    public void preUpdate(){
-//        this.updatedAt=LocalDateTime.now();
-//    }
+
 
 
 }

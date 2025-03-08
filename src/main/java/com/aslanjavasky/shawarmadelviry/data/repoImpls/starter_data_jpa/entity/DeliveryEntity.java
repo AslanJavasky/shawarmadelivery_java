@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.time.LocalDateTime;
 
 //1:1 @OneToOne @JoinColumn
@@ -15,10 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "deliveries")
-public class DeliveryEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class DeliveryEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String address;
@@ -32,5 +32,6 @@ public class DeliveryEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
+
 
 }

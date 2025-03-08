@@ -21,11 +21,8 @@ import java.time.LocalDateTime;
 @Data
 @Entity(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
-public class OrderEntity {
+public class OrderEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
@@ -52,22 +49,7 @@ public class OrderEntity {
     @Version
     private int version;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     //    @OneToOne(mappedBy = "order")
 //    private DeliveryEntity delivery;

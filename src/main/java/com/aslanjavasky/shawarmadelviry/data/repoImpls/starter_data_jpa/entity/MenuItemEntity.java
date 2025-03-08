@@ -7,7 +7,11 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,10 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Entity(name = "menu_items")
-public class MenuItemEntity implements IMenuItem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class MenuItemEntity extends BaseEntity implements IMenuItem {
 
     @Column(nullable = false)
     private String name;
@@ -32,5 +33,6 @@ public class MenuItemEntity implements IMenuItem {
 
 //    @ManyToMany(mappedBy = "itemList", cascade = CascadeType.ALL)
 //    private List<OrderEntity> orders = new ArrayList<>();
+
 
 }
