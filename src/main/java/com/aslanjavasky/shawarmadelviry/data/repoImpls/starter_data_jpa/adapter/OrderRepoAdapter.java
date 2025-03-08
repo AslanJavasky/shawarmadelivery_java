@@ -70,9 +70,10 @@ public class OrderRepoAdapter implements OrderRepo {
 
     @Override
     public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
-        OrderEntity order = orderMapper.getOrderEntityFromIOrder(getOrderById(orderId));
-        order.setStatus(status);
-        return orderMapper.getIOrderFromOrderEntity(orderRepository.save(order));
+        OrderEntity orderEntity = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+        orderEntity.setStatus(status);
+        return orderMapper.getIOrderFromOrderEntity(orderRepository.save(orderEntity));
     }
 
     @Override
