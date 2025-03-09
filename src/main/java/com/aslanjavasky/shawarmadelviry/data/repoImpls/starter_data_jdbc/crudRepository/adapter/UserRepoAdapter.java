@@ -5,6 +5,7 @@ import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.mapper.UserMapper;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -21,17 +22,20 @@ public class UserRepoAdapter implements UserRepo {
         this.mapper = mapper;
     }
 
+    @Transactional
     @Override
     public IUser saveUser(IUser user) {
         return userRepository.save(
                 mapper.getUserEntityFromIUser(user));
     }
 
+    @Transactional
     @Override
     public void deleteUser(IUser user) {
         userRepository.delete(mapper.getUserEntityFromIUser(user));
     }
 
+    @Transactional
     @Override
     public void deleteUserByEmail(String email) {
         UserEntity user = userRepository.findByEmail(email);
@@ -42,11 +46,13 @@ public class UserRepoAdapter implements UserRepo {
         }
     }
 
+    @Transactional
     @Override
     public IUser getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     @Override
     public IUser updateUser(IUser user) {
         return userRepository.save(
@@ -54,6 +60,7 @@ public class UserRepoAdapter implements UserRepo {
         );
     }
 
+    @Transactional
     public IUser getUserById(Long id) {
         Optional<UserEntity> userOptional = userRepository.findById(id);
         return userOptional.map(mapper::getIUserFromUserEntity).orElse(null);

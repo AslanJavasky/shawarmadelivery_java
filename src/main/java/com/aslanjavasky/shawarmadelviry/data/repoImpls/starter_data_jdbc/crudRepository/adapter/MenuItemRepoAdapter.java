@@ -6,6 +6,7 @@ import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.
 import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ public class MenuItemRepoAdapter implements MenuItemRepo {
         this.mapper = mapper;
     }
 
+    @Transactional
     @Override
     public IMenuItem saveMenuItem(IMenuItem menuItem) {
 
@@ -43,16 +45,19 @@ public class MenuItemRepoAdapter implements MenuItemRepo {
     }
 
 
+    @Transactional
     @Override
     public IMenuItem updateMenuItem(IMenuItem menuItem) {
         return saveMenuItem(menuItem);
     }
 
+    @Transactional
     @Override
     public IMenuItem getMenuItemById(Long id) {
         return menuItemRepository.findById(id).map(mapper::getIMenuItemFromMenuItemEntity).orElse(null);
     }
 
+    @Transactional
     @Override
     public List<IMenuItem> getMenuItemsBySection(MenuSection section) {
         return menuItemRepository.getMenuItemsByMenuSection(section).stream()
@@ -60,11 +65,13 @@ public class MenuItemRepoAdapter implements MenuItemRepo {
                 .toList();
     }
 
+    @Transactional
     @Override
     public void deleteMenuItem(IMenuItem menuItem) {
         menuItemRepository.delete(mapper.getMenuItemEntityFromIMenuItem(menuItem));
     }
 
+    @Transactional
     @Override
     public void deleteAll() {
         menuItemRepository.deleteAll();

@@ -2,6 +2,7 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.namedParamJdbcTemplate;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,6 +31,7 @@ public class OrderRepoImpl implements OrderRepo {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    @Transactional
     @Override
     public IOrder saveOrder(IOrder order) {
 
@@ -65,6 +67,7 @@ public class OrderRepoImpl implements OrderRepo {
         return order;
     }
 
+    @Transactional
     @Override
     public IOrder updateOrder(IOrder order) {
 
@@ -85,6 +88,7 @@ public class OrderRepoImpl implements OrderRepo {
         return order;
     }
 
+    @Transactional
     @Override
     public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
 
@@ -101,6 +105,7 @@ public class OrderRepoImpl implements OrderRepo {
     }
 
 
+    @Transactional
     @Override
     public List<IOrder> getOrdersByUser(IUser user) {
 
@@ -159,6 +164,7 @@ public class OrderRepoImpl implements OrderRepo {
     }
 
 
+    @Transactional
     @Override
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
         String sql = """
@@ -211,6 +217,7 @@ public class OrderRepoImpl implements OrderRepo {
     }
 
 
+    @Transactional
     public IOrder getOrderById(Long orderId) {
 
         if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");

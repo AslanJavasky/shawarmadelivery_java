@@ -12,9 +12,11 @@ import com.aslanjavasky.shawarmadelviry.domain.model.IOrder;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class OrderRepoAdapter implements OrderRepo {
 
     }
 
-
+    @Transactional
     @Override
     public IOrder updateOrder(IOrder order) {
         OrderEntity existingOrderEntity = orderRepository.findById(order.getId())
@@ -68,6 +70,7 @@ public class OrderRepoAdapter implements OrderRepo {
                 orderRepository.save(orderMapper.getOrderEntityFromIOrder(order)));
     }
 
+    @Transactional
     @Override
     public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
         OrderEntity orderEntity = orderRepository.findById(orderId)
@@ -76,12 +79,14 @@ public class OrderRepoAdapter implements OrderRepo {
         return orderMapper.getIOrderFromOrderEntity(orderRepository.save(orderEntity));
     }
 
+    @Transactional
     @Override
     public List<IOrder> getOrdersByUser(IUser user) {
         return orderRepository.findByUser(userMapper.getUserEntityFromIUser(user)).stream()
                 .map(orderMapper::getIOrderFromOrderEntity).toList();
     }
 
+    @Transactional
     @Override
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
         List<OrderEntity> orderEntities = orderRepository.findByStatusOrderByDateTimeDesc(orderStatus);

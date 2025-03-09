@@ -5,6 +5,7 @@ import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+
 import javax.sql.DataSource;
 import java.sql.*;
 
@@ -23,8 +24,14 @@ public class UserRepoImpl implements UserRepo {
         if (user == null) throw new IllegalArgumentException("User cannot be null");
 
         String sql = "INSERT INTO users ( name, email, password, telegram, phone, address) VALUES(?,?,?,?,?,?);";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+        Connection connection = null;
+        PreparedStatement ps = null;
+
+        try {
+            connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
+            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, user.getName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
@@ -40,27 +47,68 @@ public class UserRepoImpl implements UserRepo {
                     user.setId(rs.getLong("id"));
                 }
             }
+
+            connection.commit();
             return user;
         } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
             return null;
+        } finally {
+            try {
+                if (connection != null) connection.close();
+                if (ps != null) ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     @Override
     public void deleteUser(IUser user) {
         if (user == null) throw new IllegalArgumentException("User cannot be null");
         String sql = "DELETE FROM users WHERE id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            ps.setLong(1, user.getId());
-            int affectedRow = ps.executeUpdate();
-            if (affectedRow == 0) throw new SQLException("Failed to delete user, no rows affected");
+        Connection connection = null;
+
+        try {
+            connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setLong(1, user.getId());
+                int affectedRow = ps.executeUpdate();
+                if (affectedRow == 0) throw new SQLException("Failed to delete user, no rows affected");
+                connection.commit();
+            } catch (SQLException e) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
     }
 
     @Override

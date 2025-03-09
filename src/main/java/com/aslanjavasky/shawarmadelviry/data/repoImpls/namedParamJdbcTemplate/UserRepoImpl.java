@@ -3,6 +3,7 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.namedParamJdbcTemplate;
 import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,6 +31,7 @@ public class UserRepoImpl implements UserRepo {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
+    @Transactional
     @Override
     public IUser saveUser(IUser user) {
         if (user == null) throw new IllegalArgumentException("User cannot be null");
@@ -68,6 +70,7 @@ public class UserRepoImpl implements UserRepo {
     }
 
 
+    @Transactional
     @Override
     public void deleteUser(IUser user) {
         if (user == null) throw new IllegalArgumentException("User cannot be null");
@@ -79,6 +82,7 @@ public class UserRepoImpl implements UserRepo {
 
     }
 
+    @Transactional
     @Override
     public void deleteUserByEmail(String email) {
         if (email == null) throw new IllegalArgumentException("Email cannot be null");
@@ -89,6 +93,7 @@ public class UserRepoImpl implements UserRepo {
     }
 
 
+    @Transactional
     @Override
     public IUser getUserByEmail(String email) {
 //        1)queryForObject
@@ -157,6 +162,7 @@ public class UserRepoImpl implements UserRepo {
                 .orElse(null);
     }
 
+    @Transactional
     @Override
     public IUser updateUser(IUser user) {
         String sql = "UPDATE users SET " +

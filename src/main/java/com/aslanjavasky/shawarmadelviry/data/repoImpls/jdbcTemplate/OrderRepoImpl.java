@@ -2,12 +2,14 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.jdbcTemplate;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.*;
 import java.util.*;
@@ -23,9 +25,9 @@ public class OrderRepoImpl implements OrderRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Transactional
     @Override
     public IOrder saveOrder(IOrder order) {
-
         if (order == null) throw new IllegalArgumentException("order cannot be null");
 
         String sqlOrder = "INSERT INTO orders(date_time, status, user_id, total_price) VALUES(?,?,?,?);";
@@ -50,9 +52,11 @@ public class OrderRepoImpl implements OrderRepo {
             batchArgs.add(new Object[]{order.getId(), item.getId()});
         }
         jdbcTemplate.batchUpdate(sqlOrderMenuitems, batchArgs);
+
         return order;
     }
 
+    @Transactional
     @Override
     public IOrder updateOrder(IOrder order) {
 
@@ -66,6 +70,7 @@ public class OrderRepoImpl implements OrderRepo {
         return order;
     }
 
+    @Transactional
     @Override
     public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
 
@@ -79,6 +84,7 @@ public class OrderRepoImpl implements OrderRepo {
     }
 
 
+    @Transactional
     @Override
     public List<IOrder> getOrdersByUser(IUser user) {
 
@@ -132,6 +138,7 @@ public class OrderRepoImpl implements OrderRepo {
     }
 
 
+    @Transactional
     @Override
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
         String sql = """
@@ -182,6 +189,7 @@ public class OrderRepoImpl implements OrderRepo {
     }
 
 
+    @Transactional
     public IOrder getOrderById(Long orderId) {
 
         if (orderId == null) throw new IllegalArgumentException("orderId cannot be null");

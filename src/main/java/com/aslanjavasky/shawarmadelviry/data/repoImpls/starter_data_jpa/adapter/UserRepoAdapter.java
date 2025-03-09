@@ -21,12 +21,14 @@ public class UserRepoAdapter implements UserRepo {
         this.mapper = mapper;
     }
 
+    @Transactional
     @Override
     public IUser saveUser(IUser user) {
         return userRepository.save(
                 mapper.getUserEntityFromIUser(user));
     }
 
+    @Transactional
     @Override
     public void deleteUser(IUser user) {
         userRepository.delete(mapper.getUserEntityFromIUser(user));
@@ -44,11 +46,13 @@ public class UserRepoAdapter implements UserRepo {
 //        }
     }
 
+    @Transactional
     @Override
     public IUser getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     @Override
     public IUser updateUser(IUser user) {
         return userRepository.save(
@@ -56,6 +60,7 @@ public class UserRepoAdapter implements UserRepo {
         );
     }
 
+    @Transactional
     public IUser getUserById(Long id) {
         Optional<UserEntity> userOptional = userRepository.findById(id);
         return userOptional.map(mapper::getIUserFromUserEntity).orElse(null);

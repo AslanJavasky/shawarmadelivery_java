@@ -26,8 +26,8 @@ import java.util.List;
 //@Inheritance(strategy = InheritanceType.JOINED)
 //@DiscriminatorColumn(name = "user_type")
 //@Table(name = "users", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+//@Cacheable
+//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserEntity extends BaseEntity implements IUser {
     //    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
 //    @SequenceGenerator(name = "user_seq_gen", sequenceName = "user_seq", allocationSize = 1)

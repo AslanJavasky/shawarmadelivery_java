@@ -2,6 +2,7 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.jdbcTemplate;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import com.aslanjavasky.shawarmadelviry.domain.repo.DeliveryRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,6 +26,7 @@ public class DeliveryRepoImpl implements DeliveryRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Transactional
     @Override
     public IDelivery saveDelivery(IDelivery delivery) {
 
@@ -47,6 +49,7 @@ public class DeliveryRepoImpl implements DeliveryRepo {
         return delivery;
     }
 
+    @Transactional
     @Override
     public IDelivery updateDelivery(IDelivery delivery) {
 
@@ -65,6 +68,7 @@ public class DeliveryRepoImpl implements DeliveryRepo {
         return delivery;
     }
 
+    @Transactional
     @Override
     public IDelivery getDeliveryById(Long id) {
 

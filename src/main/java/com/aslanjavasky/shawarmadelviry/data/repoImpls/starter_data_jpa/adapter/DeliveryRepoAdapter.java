@@ -8,6 +8,7 @@ import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity.O
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity.mapper.DeliveryMapper;
 import com.aslanjavasky.shawarmadelviry.domain.model.IDelivery;
 import com.aslanjavasky.shawarmadelviry.domain.repo.DeliveryRepo;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class DeliveryRepoAdapter implements DeliveryRepo {
         this.mapper = mapper;
     }
 
+    @Transactional
     @Override
     public IDelivery saveDelivery(IDelivery delivery) {
 
@@ -45,6 +47,7 @@ public class DeliveryRepoAdapter implements DeliveryRepo {
     }
 
 
+    @Transactional
     @Override
     public IDelivery updateDelivery(IDelivery delivery) {
         return mapper.getIDeliveryFromDeliveryEntity(
@@ -52,6 +55,7 @@ public class DeliveryRepoAdapter implements DeliveryRepo {
     }
 
 
+    @Transactional
     @Override
     public IDelivery getDeliveryById(Long id) {
         DeliveryEntity deliveryEntity = deliveryRepository.findById(id)

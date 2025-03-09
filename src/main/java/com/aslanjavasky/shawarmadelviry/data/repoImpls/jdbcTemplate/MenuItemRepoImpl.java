@@ -4,6 +4,7 @@ import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -23,6 +24,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Transactional
     @Override
     public IMenuItem saveMenuItem(IMenuItem menuItem) {
 
@@ -50,6 +52,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
     }
 
 
+    @Transactional
     @Override
     public IMenuItem updateMenuItem(IMenuItem menuItem) {
 
@@ -67,6 +70,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
     }
 
 
+    @Transactional
     @Override
     public IMenuItem getMenuItemById(Long id) {
 
@@ -108,6 +112,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 //        });
     }
 
+    @Transactional
     @Override
     public List<IMenuItem> getMenuItemsBySection(MenuSection section) {
         String sql = "SELECT * FROM menu_items WHERE menu_section = ?";
@@ -126,6 +131,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 //        });
     }
 
+    @Transactional
     @Override
     public void deleteMenuItem(IMenuItem menuItem) {
         if (menuItem == null) throw new IllegalArgumentException("Menu Item cannot be null");
@@ -135,6 +141,7 @@ public class MenuItemRepoImpl implements MenuItemRepo {
 
     }
 
+    @Transactional
     @Override
     public void deleteAll() {
         String sql = "DELETE FROM menu_items";
