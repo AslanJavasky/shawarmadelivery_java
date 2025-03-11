@@ -46,8 +46,8 @@ public class OrderEntity extends BaseEntity {
     )
     private List<MenuItemEntity> itemList;
 
-    @Version
-    private int version;
+//    @Version
+//    private int version;
 
 
 
