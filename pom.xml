@@ -88,16 +88,24 @@
             <artifactId>modelmapper</artifactId>
             <version>3.2.2</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.liquibase</groupId>-->
+<!--            <artifactId>liquibase-core</artifactId>-->
+<!--            <version>4.31.1</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.liquibase</groupId>-->
+<!--            <artifactId>liquibase-maven-plugin</artifactId>-->
+<!--            <version>4.31.1</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>4.31.1</version>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.22.3</version>
+<!--            <version>10.11.0</version>-->
+<!--            <version>11.3.4</version>-->
         </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-maven-plugin</artifactId>
-            <version>4.31.1</version>
-        </dependency>
+
 
 
     </dependencies>
@@ -204,14 +212,30 @@
                     </generator>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>4.31.1</version>
-                <configuration>
-                    <propertyFile>src/main/resources/db/changelog/liquibase.properties</propertyFile>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.liquibase</groupId>-->
+<!--                <artifactId>liquibase-maven-plugin</artifactId>-->
+<!--                <version>4.31.1</version>-->
+<!--                <configuration>-->
+<!--                    <propertyFile>src/main/resources/db/changelog/liquibase.properties</propertyFile>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+<!--            <plugin>-->
+<!--                <groupId>org.flywaydb</groupId>-->
+<!--                <artifactId>flyway-maven-plugin</artifactId>-->
+<!--                <version>10.11.0</version>-->
+<!--                <configuration>-->
+<!--                    <url>${spring.datasource.url}</url>-->
+<!--                    <user>${spring.datasource.username}</user>-->
+<!--                    <password>${spring.datasource.password}</password>-->
+<!--                    <schemas>-->
+<!--                        <schema>public</schema>-->
+<!--                    </schemas>-->
+<!--                    <locations>-->
+<!--                        <location>classpath:db/changelog</location>-->
+<!--                    </locations>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
