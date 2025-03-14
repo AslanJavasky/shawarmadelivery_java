@@ -44,7 +44,7 @@ public class UserEntity implements IUser {
     public void setId(Long id) {
 
         Long mostSignBit = id;
-        Long leastSignBit = (id << 32) | (id>>>32);
+        Long leastSignBit = (id << 32) | (id >>> 32);
 
         this.id = id == null ? null : new UUID(mostSignBit, leastSignBit);
     }
