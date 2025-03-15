@@ -7,9 +7,10 @@ import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface MenuItemCassandraRepository extends CassandraRepository<MenuItemEntity, Long> {
+public interface MenuItemCassandraRepository extends CassandraRepository<MenuItemEntity, UUID> {
     @Query("SELECT * FROM menu_items WHERE menu_section=?0 ALLOW FILTERING")
     List<MenuItemEntity> findByMenuSection(MenuSection menuSection);
 }
