@@ -4,6 +4,8 @@ import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jdbc.entity.OrderEntity;
 import com.aslanjavasky.shawarmadelviry.domain.model.IDelivery;
 import com.aslanjavasky.shawarmadelviry.domain.model.IOrder;
+import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
+import com.aslanjavasky.shawarmadelviry.domain.model.User;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;

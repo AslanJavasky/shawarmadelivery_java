@@ -1,13 +1,13 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.adapter;
 
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.MenuItemCassandraRepository;
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.UUIDUtils;
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.entity.mapper.MenuItemMapper;
 import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component("MenuItemRepoAdapter_Cassandra")
@@ -39,7 +39,8 @@ public class MenuItemRepoAdapter implements MenuItemRepo {
 
     @Override
     public IMenuItem getMenuItemById(Long id) {
-        return menuItemRepository.findById(id).map(mapper::getIMenuItemFromMenuItemEntity).orElse(null);
+        return menuItemRepository.findById(UUIDUtils.getUUIDFromLong((id)))
+                .map(mapper::getIMenuItemFromMenuItemEntity).orElse(null);
     }
 
 
@@ -60,4 +61,5 @@ public class MenuItemRepoAdapter implements MenuItemRepo {
     public void deleteAll() {
         menuItemRepository.deleteAll();
     }
+
 }

@@ -2,6 +2,7 @@ package com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.adapter;
 
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.MenuItemCassandraRepository;
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.OrderCassandraRepository;
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.UUIDUtils;
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.UserCassandraRepository;
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.entity.OrderEntity;
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.entity.mapper.MenuItemMapper;
@@ -15,6 +16,7 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,8 +55,7 @@ public class OrderRepoAdapter implements OrderRepo {
     @Override
     public IOrder updateOrder(IOrder order) {
         OrderEntity orderEntityForSaving = orderMapper.getOrderEntityFromIOrder(order);
-        OrderEntity existingOrderEntity = orderRepository.findById(orderEntityForSaving.getId())
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + order.getId()));
+        OrderEntity existingOrderEntity = getOrderEntityByUUID(orderEntityForSaving.getId());
         OrderEntity savedOrderEntity = orderRepository.save(orderEntityForSaving);
         return getOrderById(savedOrderEntity.getId());
     }
@@ -63,8 +64,7 @@ public class OrderRepoAdapter implements OrderRepo {
     @Override
     public IOrder updateOrderStatus(Long orderId, OrderStatus status) {
 
-        OrderEntity orderEntity = orderRepository.findById(getUUIDFromLong(orderId))
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+        OrderEntity orderEntity = getOrderEntityByUUID(UUIDUtils.getUUIDFromLong(orderId));
         orderEntity.setStatus(status);
         OrderEntity savedOrderEntity = orderRepository.save(orderEntity);
         return getOrderById(savedOrderEntity.getId());
@@ -74,7 +74,7 @@ public class OrderRepoAdapter implements OrderRepo {
     @Override
     public List<IOrder> getOrdersByUser(IUser user) {
 
-        UUID userId = getUUIDFromLong(user.getId());
+        UUID userId = UUIDUtils.getUUIDFromLong(user.getId());
         List<OrderEntity> ordersEntity = orderRepository.findByUser(userId);
         return ordersEntity.stream().map(entity -> getOrderById(entity.getId())).toList();
 
@@ -85,15 +85,16 @@ public class OrderRepoAdapter implements OrderRepo {
     public List<IOrder> getOrdersByStatus(OrderStatus orderStatus) {
         List<OrderEntity> orderEntities = orderRepository.findByStatus(orderStatus);
         return orderEntities
-                .stream().map(orderEntity -> getOrderById(orderEntity.getId()))
+                .stream()
+                .sorted(Comparator.comparing(OrderEntity::getDateTime).reversed())
+                .map(orderEntity -> getOrderById(orderEntity.getId()))
                 .toList();
     }
 
 
     public IOrder getOrderById(UUID orderId) {
 
-        OrderEntity orderEntity = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+        OrderEntity orderEntity = getOrderEntityByUUID(orderId);
 
         IUser user = userMapper.getIUserFromUserEntity(
                 userRepository.findById(orderEntity.getUserId())
@@ -109,10 +110,9 @@ public class OrderRepoAdapter implements OrderRepo {
         return orderMapper.getIOrderFromOrderEntity(orderEntity, user, menuItems);
     }
 
-    private UUID getUUIDFromLong(Long id) {
-        Long mostSignBit = id;
-        Long leastSignBit = (id << 32) | (id >>> 32);
-
-        return id != null ? new UUID(mostSignBit, leastSignBit) : UUID.randomUUID();
+    private OrderEntity getOrderEntityByUUID(UUID orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
     }
+
 }

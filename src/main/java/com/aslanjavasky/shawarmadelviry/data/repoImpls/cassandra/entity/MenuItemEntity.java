@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.entity;
 
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.UUIDUtils;
 import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
 import com.aslanjavasky.shawarmadelviry.domain.model.MenuSection;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @Table("menu_items")
-public class MenuItemEntity implements IMenuItem {
+public class MenuItemEntity  {
 
     @PrimaryKey
     private UUID id = UUID.randomUUID();
@@ -30,19 +31,6 @@ public class MenuItemEntity implements IMenuItem {
     @Column
     private BigDecimal price;
 
-    @Override
-    public Long getId() {
-        return this.id.getMostSignificantBits();
-    }
-
-    @Override
-    public void setId(Long id) {
-
-        Long mostSignBit = id;
-        Long leastSignBit = (id << 32) | (id >>> 32);
-
-        this.id = id == null ? null : new UUID(mostSignBit, leastSignBit);
-    }
 
 
 }

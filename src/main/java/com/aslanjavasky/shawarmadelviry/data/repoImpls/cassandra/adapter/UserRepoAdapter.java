@@ -7,11 +7,9 @@ import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import java.util.Random;
 import java.util.UUID;
 
-@Component("URwCassandra")
+@Component("UserRepoAdapter_Cassandra")
 public class UserRepoAdapter implements UserRepo {
 
     private final UserCassandraRepository userRepository;
@@ -25,9 +23,7 @@ public class UserRepoAdapter implements UserRepo {
 
     @Override
     public IUser saveUser(IUser user) {
-
         UserEntity userEntity = userMapper.getUserEntityFromIUser(user);
-        if (userEntity.getId() == null) userEntity.setId(new Random().nextLong());
         return userMapper.getIUserFromUserEntity(userRepository.save(userEntity));
 
     }
@@ -39,7 +35,7 @@ public class UserRepoAdapter implements UserRepo {
 
     @Override
     public void deleteUserByEmail(String email) {
-        UserEntity userEntity=userRepository.findByEmail(email);
+        UserEntity userEntity = userRepository.findByEmail(email);
         if (userEntity != null) userRepository.delete(userEntity);
     }
 
@@ -55,6 +51,6 @@ public class UserRepoAdapter implements UserRepo {
     }
 
     public IUser getUserById(UUID uuid) {
-        return userRepository.findById(uuid).orElse(null);
+        return userMapper.getIUserFromUserEntity(userRepository.findById(uuid).orElse(null));
     }
 }

@@ -1,5 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.entity.mapper;
 
+import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.UUIDUtils;
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.cassandra.entity.OrderEntity;
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
 import org.modelmapper.ModelMapper;
@@ -22,12 +23,15 @@ public class OrderMapper {
         if (iOrder == null) return null;
 
         return new OrderEntity(
-                getUUIDFromLong(iOrder.getId()),
+                UUIDUtils.getUUIDFromLong((iOrder.getId())),
                 iOrder.getDateTime(),
                 iOrder.getStatus(),
-                getUUIDFromLong(iOrder.getUser().getId()),
+                UUIDUtils.getUUIDFromLong(iOrder.getUser().getId()),
                 iOrder.getTotalPrice(),
-                iOrder.getItemList().stream().map(item -> getUUIDFromLong(item.getId())).toList()
+                iOrder.getItemList()
+                        .stream()
+                        .map(item -> UUIDUtils.getUUIDFromLong(item.getId()))
+                        .toList()
         );
     }
 
@@ -35,20 +39,13 @@ public class OrderMapper {
 
         if (orderEntity == null) return null;
         return new Order(
-                orderEntity.getId().getMostSignificantBits(),
+                UUIDUtils.getLongFromUUID(orderEntity.getId()),
                 orderEntity.getDateTime(),
                 orderEntity.getStatus(),
                 user,
                 itemList,
                 orderEntity.getTotalPrice()
         );
-    }
-
-    private UUID getUUIDFromLong(Long id) {
-        Long mostSignBit = id;
-        Long leastSignBit = (id << 32) | (id >>> 32);
-
-        return id != null ? new UUID(mostSignBit, leastSignBit) : UUID.randomUUID();
     }
 
 }
