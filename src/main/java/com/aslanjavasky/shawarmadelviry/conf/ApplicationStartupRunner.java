@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-@Component
+//@Component
 public class ApplicationStartupRunner implements CommandLineRunner {
 
     private final MenuItemRepo menuItemRepo;
 
     public ApplicationStartupRunner(
-            @Qualifier("MenuItemRepoAdapter_Cassandra") MenuItemRepo menuItemRepo) {
+            @Qualifier("MenuItemRepoAdapter_JPA") MenuItemRepo menuItemRepo) {
 
         this.menuItemRepo = menuItemRepo;
     }
