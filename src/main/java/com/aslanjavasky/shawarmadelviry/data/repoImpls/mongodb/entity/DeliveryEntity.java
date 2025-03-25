@@ -1,35 +1,26 @@
-//package com.aslanjavasky.shawarmadelviry.data.repoImpls.mondodb.entity;
-//
-//import lombok.AllArgsConstructor;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//import org.springframework.data.cassandra.core.mapping.Column;
-//import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-//import org.springframework.data.cassandra.core.mapping.Table;
-//
-//import java.time.LocalDateTime;
-//import java.util.UUID;
-//
-//
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
-////@Table("deliveries")
-//public class DeliveryEntity  {
-//
-//    @PrimaryKey
-//    private UUID id= UUID.randomUUID();
-//
-//    @Column
-//    private String address;
-//
-//    @Column
-//    private String phone;
-//
-//    @Column("date_time")
-//    private LocalDateTime dateTime;
-//
-//    @Column("order_id")
-//    private UUID orderId;
-//
-//}
+package com.aslanjavasky.shawarmadelviry.data.repoImpls.mongodb.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "deliveries")
+public class DeliveryEntity {
+
+    @Id
+    private UUID id = UUID.randomUUID();
+    private String address;
+    private String phone;
+    private LocalDateTime dateTime;
+    private UUID orderId;
+
+}
