@@ -10,7 +10,7 @@ public class UserService extends UserInterractor {
 
     private UserRepo userRepo;
 
-    public UserService(@Qualifier("UserRepoAdapter_MongoDB") UserRepo userRepo) {
+    public UserService(@Qualifier("UserRepoAdapter_Redis") UserRepo userRepo) {
         super(userRepo);
     }
 }

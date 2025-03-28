@@ -17,7 +17,7 @@ public class ApplicationStartupRunner implements CommandLineRunner {
     private final MenuItemRepo menuItemRepo;
 
     public ApplicationStartupRunner(
-            @Qualifier("MenuItemRepoAdapter_MongoDB") MenuItemRepo menuItemRepo) {
+            @Qualifier("MenuItemRepoAdapter_Redis") MenuItemRepo menuItemRepo) {
 
         this.menuItemRepo = menuItemRepo;
     }
