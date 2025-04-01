@@ -1,19 +1,16 @@
-package com.aslanjavasky.shawarmadelviry.conf;
+package com.aslanjavasky.shawarmadelviry.data.repoImpls.neo4j;
 
 import org.neo4j.driver.Driver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.neo4j.core.transaction.Neo4jTransactionManager;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class ShawarmaConfig {
+public class Neo4jConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
+    public PlatformTransactionManager transactionManager(Driver driver){
+        return new Neo4jTransactionManager(driver);
     }
-
 }

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.List;
 
@@ -23,6 +24,6 @@ public class UserEntity {
     private String telegram;
     private String phone;
     private String address;
-    @Relationship(type = "PLACED_ORDER", direction = Relationship.Direction.OUTGOING)
-    private List<OrderEntity> orders;
+//    @Relationship(type = "PLACED_ORDER", direction = Relationship.Direction.OUTGOING)
+//    private List<OrderEntity> orders = new ArrayList<>();
 }

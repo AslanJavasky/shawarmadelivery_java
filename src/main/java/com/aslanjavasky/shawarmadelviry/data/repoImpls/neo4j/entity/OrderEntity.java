@@ -23,10 +23,11 @@ public class OrderEntity {
     private LocalDateTime dateTime;
     private OrderStatus status;
     @Relationship(type = "ORDERED_BY", direction = Relationship.Direction.INCOMING)
-    private UserEntity user;
+    private UserEntity user = new UserEntity();
     private BigDecimal totalPrice;
     @Relationship(type = "CONTAINS", direction = Relationship.Direction.OUTGOING)
-    private List<MenuItemEntity> menuItems;
-    @Relationship(type = "HAS_DELIVERY", direction = Relationship.Direction.OUTGOING)
-    private DeliveryEntity delivery;
+    private List<MenuItemEntity> itemList;
+//    @Relationship(type = "HAS_DELIVERY", direction = Relationship.Direction.OUTGOING)
+//    private DeliveryEntity delivery;
+
 }
