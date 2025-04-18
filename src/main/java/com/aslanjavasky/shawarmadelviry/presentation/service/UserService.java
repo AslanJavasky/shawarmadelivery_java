@@ -10,7 +10,7 @@ public class UserService extends UserInterractor {
 
     private UserRepo userRepo;
 
-    public UserService(@Qualifier("UserRepoAdapter_Neo4j") UserRepo userRepo) {
+    public UserService(@Qualifier("UserRepoAdapter_JPA") UserRepo userRepo) {
         super(userRepo);
     }
 }

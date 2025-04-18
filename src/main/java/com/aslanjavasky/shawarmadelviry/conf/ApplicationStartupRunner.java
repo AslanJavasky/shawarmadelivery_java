@@ -17,7 +17,7 @@ public class ApplicationStartupRunner implements CommandLineRunner {
     private final MenuItemRepo menuItemRepo;
 
     public ApplicationStartupRunner(
-            @Qualifier("MenuItemRepoAdapter_Neo4j") MenuItemRepo menuItemRepo) {
+            @Qualifier("MenuItemRepoAdapter_JPA") MenuItemRepo menuItemRepo) {
 
         this.menuItemRepo = menuItemRepo;
     }
