@@ -13,4 +13,5 @@ public class User implements IUser {
     private String telegram;
     private String phone;
     private String address;
+    private String username;
 }

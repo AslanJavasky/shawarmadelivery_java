@@ -9,9 +9,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class ShawarmaConfig {
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+
 
 }

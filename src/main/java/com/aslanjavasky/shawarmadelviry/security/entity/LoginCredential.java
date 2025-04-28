@@ -1,22 +1,15 @@
-package com.aslanjavasky.shawarmadelviry.presentation.service.dto;
+package com.aslanjavasky.shawarmadelviry.security.entity;
 
-import com.aslanjavasky.shawarmadelviry.security.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.List;
 
 @Data
 public class LoginCredential {
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
-    private String email;
+    private String username;
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password should be at least 6 characters")
     private String password;

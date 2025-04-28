@@ -1,10 +1,6 @@
 package com.aslanjavasky.shawarmadelviry.domain.model;
 
-import lombok.Data;
-import lombok.ToString;
-
-
-public interface IUser {
+public interface IUser  {
 
     Long getId();
 
@@ -13,6 +9,10 @@ public interface IUser {
     String getName();
 
     void setName(String name);
+
+    String getUsername();
+
+    void setUsername(String name);
 
     String getEmail();
 

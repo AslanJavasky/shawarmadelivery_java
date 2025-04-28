@@ -14,7 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Controller
+//@Controller
 @RequestMapping("/users") //localhost:8081/users
 public class UserController {
 
@@ -48,15 +48,14 @@ public class UserController {
             return "register";
         }
 
-        String encodedPassword = authUtils.encodePassword(userDto.getPassword());
-        userDto.setPassword(encodedPassword);
-        userService.createUser(userDto);
+        userService.registerUser(userDto);
         sessionInfoService.setUserFields(userDto);
 
         log.info("userDto (POST registerUser)" + String.valueOf(userDto));
         log.info("sessionInfoService (POST registerUser)" + String.valueOf(sessionInfoService));
         model.addAttribute("msg", "User registered successfully!");
-        return "redirect:/users/login";
+//        return "redirect:/users/login";
+        return "redirect:/users/login?registered";
     }
 
     @GetMapping("/login")

@@ -1,17 +1,12 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity;
 
-import com.aslanjavasky.shawarmadelviry.domain.model.IMenuItem;
-import com.aslanjavasky.shawarmadelviry.domain.model.IOrder;
-import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
+import com.aslanjavasky.shawarmadelviry.security.entity.UserSecurity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

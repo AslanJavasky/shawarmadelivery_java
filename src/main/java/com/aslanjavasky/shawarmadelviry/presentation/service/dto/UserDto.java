@@ -30,4 +30,5 @@ public class UserDto implements IUser {
     @NotBlank(message = "Address required")
 //    @Min(value = 4, message = "Address must be more than 4 characters")
     private String address;
+    private String username;
 }

@@ -10,10 +10,14 @@ import org.hibernate.annotations.Cache;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.JDBCType;
 import java.sql.Types;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -39,6 +43,7 @@ public class UserEntity extends BaseEntity implements IUser {
 //    @Basic(optional = false,fetch = FetchType.EAGER)
 //    @JdbcType(value= JDBCType.LONGNVARCHAR)
     private String name;
+    private String username;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -51,6 +56,7 @@ public class UserEntity extends BaseEntity implements IUser {
 
     @OneToMany(mappedBy = "user")
     private List<OrderEntity> orders;
+
 
 //    @Formula("(SELECT COUNT(*) FROM users)")
 //    transient private Long userCount;
