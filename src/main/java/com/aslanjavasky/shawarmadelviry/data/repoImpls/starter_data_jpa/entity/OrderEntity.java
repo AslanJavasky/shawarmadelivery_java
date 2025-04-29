@@ -1,7 +1,7 @@
 package com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity;
 
 import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
-import com.aslanjavasky.shawarmadelviry.security.entity.UserSecurity;
+//import com.aslanjavasky.shawarmadelviry.security.entity.UserSecurity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

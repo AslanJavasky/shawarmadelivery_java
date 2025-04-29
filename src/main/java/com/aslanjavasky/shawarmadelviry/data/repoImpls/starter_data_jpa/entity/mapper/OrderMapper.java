@@ -4,7 +4,7 @@ import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity.M
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity.OrderEntity;
 import com.aslanjavasky.shawarmadelviry.data.repoImpls.starter_data_jpa.entity.UserEntity;
 import com.aslanjavasky.shawarmadelviry.domain.model.*;
-import com.aslanjavasky.shawarmadelviry.security.entity.UserSecurity;
+//import com.aslanjavasky.shawarmadelviry.security.entity.UserSecurity;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import java.util.List;
