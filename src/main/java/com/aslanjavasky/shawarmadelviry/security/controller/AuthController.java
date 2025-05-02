@@ -14,6 +14,10 @@
 //
 //@Slf4j
 //@RequiredArgsConstructor
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 ////@Controller
 //@RequestMapping("/auth")
 //public class AuthController {
@@ -22,6 +26,9 @@
 //    private final PasswordEncoder passwordEncoder;
 //
 //
+
+//    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+//    @PreAuthorize("hasAuthority('READ_PRIVILEGE')")
 //    @GetMapping("/register")
 //    public String register(
 //            Model model
