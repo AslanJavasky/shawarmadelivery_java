@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component("DeliveryRepoAdapter_JPA")
+//@Component("DeliveryRepoAdapter_JPA")
 public class DeliveryRepoAdapter implements DeliveryRepo {
 
     private final DeliveryJpaRepository deliveryRepository;

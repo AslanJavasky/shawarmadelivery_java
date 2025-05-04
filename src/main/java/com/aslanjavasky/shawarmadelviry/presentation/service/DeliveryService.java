@@ -5,7 +5,7 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.DeliveryRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class DeliveryService extends DeliveryInterractor {
     public DeliveryService(@Qualifier("DeliveryRepoAdapter_JPA") DeliveryRepo repo) {
         super(repo);

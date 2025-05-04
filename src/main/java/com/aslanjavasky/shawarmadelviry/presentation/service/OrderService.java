@@ -5,7 +5,7 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class OrderService extends OrderInterractor {
     public OrderService(@Qualifier("OrderRepoAdapter_JPA") OrderRepo repo) {
         super(repo);

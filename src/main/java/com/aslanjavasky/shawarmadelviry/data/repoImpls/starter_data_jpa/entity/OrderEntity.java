@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity(name = "orders")
+//@Entity(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 public class OrderEntity extends BaseEntity {
 

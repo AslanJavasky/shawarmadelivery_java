@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Entity(name = "menu_items")
+//@Entity(name = "menu_items")
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "menu_cache")
 public class MenuItemEntity extends BaseEntity implements IMenuItem {

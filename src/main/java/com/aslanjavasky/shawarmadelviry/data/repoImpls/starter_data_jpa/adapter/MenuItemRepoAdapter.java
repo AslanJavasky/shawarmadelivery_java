@@ -9,7 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
-@Component("MenuItemRepoAdapter_JPA")
+//@Component("MenuItemRepoAdapter_JPA")
 public class MenuItemRepoAdapter implements MenuItemRepo {
 
     private final MenuItemJpaRepository menuItemRepository;

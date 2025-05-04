@@ -9,7 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
-@Component("OrderM_JPA")
+//@Component("OrderM_JPA")
 public class OrderMapper {
 
     private final ModelMapper modelMapper;

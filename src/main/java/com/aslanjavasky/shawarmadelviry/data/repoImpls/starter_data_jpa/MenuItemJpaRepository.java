@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+//@Repository
 public interface MenuItemJpaRepository extends JpaRepository<MenuItemEntity, Long> {
     List<MenuItemEntity> findByMenuSection(MenuSection menuSection);
 }

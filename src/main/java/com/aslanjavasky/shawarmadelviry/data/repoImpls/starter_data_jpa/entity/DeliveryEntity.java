@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "deliveries")
+//@Entity(name = "deliveries")
 public class DeliveryEntity extends BaseEntity {
 
     @Column(nullable = false)
