@@ -5,7 +5,7 @@ import com.aslanjavasky.shawarmadelviry.domain.model.IUser;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-//@Component("UserM_JPA")
+@Component("UserM_JPA")
 public class UserMapper {
 
     private final ModelMapper modelMapper;

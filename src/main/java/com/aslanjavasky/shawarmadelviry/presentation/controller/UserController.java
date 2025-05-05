@@ -14,7 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-//@Controller
+@Controller
 @RequestMapping("/users") //localhost:8081/users
 public class UserController {
 

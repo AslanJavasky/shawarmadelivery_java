@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.List;
 
 @Slf4j
-//@Controller
+@Controller
 @RequestMapping("/menu")
 public class MenuController {
 

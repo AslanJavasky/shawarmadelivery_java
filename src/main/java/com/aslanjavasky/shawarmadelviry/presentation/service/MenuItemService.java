@@ -5,7 +5,7 @@ import com.aslanjavasky.shawarmadelviry.domain.repo.MenuItemRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-//@Service
+@Service
 public class MenuItemService extends MenuItemInterractor {
 
     public MenuItemService (@Qualifier("MenuItemRepoAdapter_JPA") MenuItemRepo repo) {

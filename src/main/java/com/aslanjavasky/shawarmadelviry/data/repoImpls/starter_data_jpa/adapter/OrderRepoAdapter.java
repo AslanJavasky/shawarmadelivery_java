@@ -14,13 +14,11 @@ import com.aslanjavasky.shawarmadelviry.domain.model.OrderStatus;
 import com.aslanjavasky.shawarmadelviry.domain.repo.OrderRepo;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-//@Component("OrderRepoAdapter_JPA")
+@Component("OrderRepoAdapter_JPA")
 public class OrderRepoAdapter implements OrderRepo {
 
     private final OrderJpaRepository orderRepository;

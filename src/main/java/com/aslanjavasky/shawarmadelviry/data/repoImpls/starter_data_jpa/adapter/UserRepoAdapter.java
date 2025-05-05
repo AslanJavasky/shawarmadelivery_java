@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import java.util.Optional;
 
-//@Component("UserRepoAdapter_JPA")
+@Component("UserRepoAdapter_JPA")
 public class UserRepoAdapter implements UserRepo {
 
     private final UserJpaRepository userRepository;

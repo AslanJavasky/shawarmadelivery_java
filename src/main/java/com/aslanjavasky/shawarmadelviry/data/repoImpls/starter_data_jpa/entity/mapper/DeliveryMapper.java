@@ -7,7 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-//@Component("DeliveryM_JPA")
+@Component("DeliveryM_JPA")
 public class DeliveryMapper {
 
     private final ModelMapper modelMapper;

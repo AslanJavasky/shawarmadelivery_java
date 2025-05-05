@@ -11,7 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Data @NoArgsConstructor @AllArgsConstructor
-//@MappedSuperclass
+@MappedSuperclass
 public abstract class BaseEntity {
 
     @Id

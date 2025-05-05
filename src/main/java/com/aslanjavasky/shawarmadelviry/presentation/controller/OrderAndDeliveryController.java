@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-//@Controller
+@Controller
 public class OrderAndDeliveryController {
 
     private final OrderService orderService;
